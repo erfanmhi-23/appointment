@@ -9,8 +9,8 @@ class Doctor(models.Model):
     field = models.CharField(max_length=150)
     expertise = models.TextField(blank=True, null=True)
     np = models.CharField(max_length=10, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    
     def __str__(self):
         return f"Dr.{self.user.get_full_name()} - {self.field}"
 
