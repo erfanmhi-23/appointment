@@ -6,6 +6,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - media_volume:/app/media
+      - static_volume:/app/static
     environment:
       - DEBUG=1
     depends_on:
@@ -18,3 +20,7 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+
+volumes:
+  media_volume:
+  static_volume:
