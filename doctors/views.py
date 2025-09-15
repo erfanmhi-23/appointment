@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from models import Doctor, Office, Timesheet, Visittime
+from doctors.models import Doctor,Office,Timesheet,Visittime
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -57,3 +57,6 @@ def cancel_visit_time(request, visit_id):
         visit_time.save()
         return redirect('doctor_free_times', doctor_id=visit_time.doctor.id)
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
+
+def home(request):
+    return render(request, 'base.html')
