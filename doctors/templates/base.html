@@ -126,7 +126,7 @@
             </div>
         </div>
         <nav class="menu">
-            <a href="#">لیست پزشکان </a>
+            <a href="{% url 'docto_list' %}">لیست پزشکان </a>
             <a href="#">گزینه 2</a>
             <a href="#">گزینه 3</a>
         </nav>
@@ -136,8 +136,9 @@
     </header>
     
     <main>
-        <h1>خوش آمدید</h1>
-        <p>این یک صفحه پایه HTML است. می‌توانید محتوای بیشتری اضافه کنید.</p>
+        {% block content %}
+        
+        {% endblock %}
     </main>
     
     <footer class="quick-access">

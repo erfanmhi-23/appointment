@@ -8,7 +8,7 @@ from django.utils import timezone
 
 def doctor_list(request):
     doctors = Doctor.objects.all()[:10]
-    return render(request, 'doctors/doctor_list.html',{'doctors':doctors})
+    return render(request, 'doctor_list.html',{'doctors':doctors})
     #paginator
 def office_list(request):
     location = request.GET.get('location')
