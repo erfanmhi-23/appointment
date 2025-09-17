@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 version: '3'
 services:
   web:
     build: .
     ports:
       - "8000:8000"
+=======
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "8001:8001"
+>>>>>>> Erfan
     volumes:
       - .:/app
       - media_volume:/app/media
@@ -12,8 +21,14 @@ services:
       - DEBUG=1
     depends_on:
       - db
+<<<<<<< HEAD
   db:
     image: postgres:15
+=======
+
+  db:
+    image: docker.arvancloud.ir/postgres:15
+>>>>>>> Erfan
     environment:
       POSTGRES_DB: appointment_db
       POSTGRES_USER: postgres
