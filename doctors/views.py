@@ -57,3 +57,6 @@ def cancel_visit_time(request, visit_id):
         visit_time.save()
         return redirect('doctor_free_times', doctor_id=visit_time.doctor.id)
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
+
+def home(request):
+    return render(request, 'base.html')
