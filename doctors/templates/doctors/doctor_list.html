@@ -5,7 +5,7 @@
 {% block content %}
     <h2>لیست دکترها</h2>
     <ul>
-        {% for doctor in doctors %}
+        {% for doctor in page_obj %}
             <li>
                 دکتر {{ doctor.id }} - تخصص: {{ doctor.np }}
             </li>
@@ -13,4 +13,16 @@
             <li>هیچ دکتری یافت نشد.</li>
         {% endfor %}
     </ul>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+        {% endif %}
+
+        <span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
+        {% endif %}
+    </div>
 {% endblock %}

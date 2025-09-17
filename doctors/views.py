@@ -4,12 +4,19 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from doctors.models import Doctor, Office, Timesheet, Visittime
+from django.core.paginator import Paginator
 
 
 def doctor_list(request):
-    doctors = Doctor.objects.all()[:10]
+    doctors = Doctor.objects.all()
     return render(request, 'doctors/doctor_list.html',{'doctors':doctors})
-    #paginator
+    paginator = Paginator(doctors, 10)
+    page_num = request.GET.get("page")
+    page_obj = Paginator.get_page(page_num)
+    return render(request, 'doctors/doctor_list.html', {
+        'page_obj': page_obj,
+    })
+
 def office_list(request):
     location = request.GET.get('location')
     if location:
