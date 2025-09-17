@@ -1,36 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
-<<<<<<< HEAD
 from doctors.models import Doctor,Office,Timesheet,Visittime
-=======
->>>>>>> Erfan
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-<<<<<<< HEAD
+from django.core.paginator import Paginator
 
 
 
 def doctor_list(request):
     doctors = Doctor.objects.all()[:10]
-    return render(request, 'doctor_list.html',{'doctors':doctors})
-    #paginator
-=======
-from doctors.models import Doctor, Office, Timesheet, Visittime
-from django.core.paginator import Paginator
-
-
-def doctor_list(request):
-    doctors = Doctor.objects.all()
-    return render(request, 'doctors/doctor_list.html',{'doctors':doctors})
     paginator = Paginator(doctors, 10)
     page_num = request.GET.get("page")
-    page_obj = Paginator.get_page(page_num)
-    return render(request, 'doctors/doctor_list.html', {
-        'page_obj': page_obj,
-    })
+    page_obj = paginator.get_page(page_num)
+    return render(request, 'doctors/doctor_list.html', {'page_obj': page_obj,})
 
->>>>>>> Erfan
 def office_list(request):
     location = request.GET.get('location')
     if location:
@@ -80,8 +64,4 @@ def cancel_visit_time(request, visit_id):
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
 def home(request):
-<<<<<<< HEAD
     return render(request, 'base.html')
-=======
-    return render(request, 'doctors/base.html')
->>>>>>> Erfan
