@@ -59,4 +59,4 @@ def cancel_visit_time(request, visit_id):
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'doctors/base.html')
