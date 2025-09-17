@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}لیست دکترها{% endblock %}
+
+{% block content %}
+    <style>
+        table.table td, table.table th {
+            padding: 12px 20px;
+        }
+    </style>
+    <h2 class="mb-4">لیست دکترها</h2>
+    {% if doctors %}
+        <table class="table table-hover table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>نام دکتر</th>
+                    <th>تخصص دکتر</th>
+                    <th>نظام پزشکی</th>
+                    <th>نمایش نوبت‌ها</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in doctors %}
+                    <tr>
+                        <td>{{ doc.get_full_name }}</td>
+                        <td>{{ doc.field }}</td>
+                        <td>{{ doc.np }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary" title="نمایش نوبت‌ها">
+                                <i class="fas fa-calendar-alt"> + </i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">هیچ دکتری موجود نیست.</p>
+    {% endif %}
+{% endblock %}
