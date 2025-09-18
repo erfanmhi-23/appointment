@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from doctors.models import Doctor,Office,Timesheet,Visittime
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from doctors.models import Doctor, Office, Timesheet, Visittime
 from django.core.paginator import Paginator
+
 
 
 def doctor_list(request):
@@ -65,4 +66,4 @@ def cancel_visit_time(request, visit_id):
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
 def home(request):
-    return render(request, 'doctors/base.html')
+    return render(request, 'base.html')
