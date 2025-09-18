@@ -11,18 +11,12 @@ from .forms import DoctorCreateForm
 
 
 def doctor_list(request):
-<<<<<<< HEAD
-    doctors = Doctor.objects.all()[:10]
-    return render(request, 'doctor_list.html',{'doctors':doctors})
-    #paginator
-=======
     doctors = Doctor.objects.all()
     paginator = Paginator(doctors, 10)
     page_num = request.GET.get("page")
     page_obj = paginator.get_page(page_num)
     return render(request, 'doctors/doctor_list.html', {'page_obj': page_obj})
 
->>>>>>> origin/Erfan
 def office_list(request):
     location = request.GET.get('location')
     if location:
@@ -72,9 +66,6 @@ def cancel_visit_time(request, visit_id):
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
 def home(request):
-<<<<<<< HEAD
-    return render(request, 'base.html')
-=======
     return render(request, 'base.html')
 
 def is_admin(user):
@@ -95,4 +86,3 @@ def add_doctor(request):
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
     return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})
->>>>>>> origin/Erfan
