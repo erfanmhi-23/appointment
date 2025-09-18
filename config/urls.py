@@ -23,11 +23,7 @@ from doctors import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-<<<<<<< HEAD
-    path('docs/', include('doctors.urls'))
-=======
     path('doctors/', include('doctors.urls'))
->>>>>>> origin/Erfan
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -4,11 +4,7 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-<<<<<<< HEAD
-    path('doctors/', views.doctor_list, name='docto_list'),
-=======
     path('doctors/', views.doctor_list, name='doctor_list'),
->>>>>>> origin/Erfan
     path('offices/', views.office_list, name='office_list'),
     path('doctor-search/', views.doctor_search, name='doctor_search'),
     path('timesheets/', views.timesheet_list, name='timesheet_list'),
