@@ -9,10 +9,9 @@ from django.core.paginator import Paginator
 
 def doctor_list(request):
     doctors = Doctor.objects.all()
-    return render(request, 'doctors/doctor_list.html',{'doctors':doctors})
     paginator = Paginator(doctors, 10)
     page_num = request.GET.get("page")
-    page_obj = Paginator.get_page(page_num)
+    page_obj = paginator.get_page(page_num)
     return render(request, 'doctors/doctor_list.html', {
         'page_obj': page_obj,
     })
