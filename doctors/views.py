@@ -8,14 +8,13 @@ from django.core.paginator import Paginator
 
 
 
+
 def doctor_list(request):
     doctors = Doctor.objects.all()
     paginator = Paginator(doctors, 10)
     page_num = request.GET.get("page")
     page_obj = paginator.get_page(page_num)
-    return render(request, 'doctors/doctor_list.html', {
-        'page_obj': page_obj,
-    })
+    return render(request, 'doctor_list.html', {'page_obj': page_obj,})
 
 def office_list(request):
     location = request.GET.get('location')
