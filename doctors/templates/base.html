@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحه اصلی</title>
+    <title>{% block title %}صفحه اصلی{% endblock %}</title>
     <style>
         body {
             font-family: 'Tahoma', sans-serif;
@@ -58,6 +58,7 @@
         .login-section {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
         .login-section button {
             background-color: #0056b3;
@@ -73,12 +74,12 @@
         }
         .menu {
             display: flex;
-            gap: 20px;
+            gap: 15px;
         }
         .menu a {
             color: white;
             text-decoration: none;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border-radius: 4px;
             font-size: 16px;
         }
@@ -120,66 +121,53 @@
     <header>
         <div class="logo-section">
             <img src="{% static 'image/logo.jpg' %}" alt="لوگو" class="logo">
-            <div class="search-box">
-                <input type="text" placeholder="جستجو...">
-                <button onclick="search()">جستجو</button>
-            </div>
+
+            <!-- فرم جستجو -->
+            <form method="get" action="{% url 'doctor_search' %}" class="search-box">
+                <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص...">
+                <button type="submit">جستجو</button>
+            </form>
         </div>
+
         <nav class="menu">
-            <a href="{% url 'docto_list' %}">لیست پزشکان </a>
+            <a href="{% url 'doctor_list' %}">لیست پزشکان</a>
             <a href="#">گزینه 2</a>
             <a href="#">گزینه 3</a>
+
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'add_doctor' %}" style="background-color:#ffc107;">اضافه کردن دکتر</a>
+                <a href="{% url 'timesheet_list' %}" style="background-color:#28a745;">مدیریت تایم‌شیت‌ها</a>
+                <a href="{% url 'office_list' %}" style="background-color:#17a2b8;">مدیریت دفاتر</a>
+            {% endif %}
         </nav>
+
         <div class="login-section" id="loginSection">
-            <button id="loginBtn" onclick="handleLogin()">ورود</button>
+            {% if user.is_authenticated %}
+                <span style="margin-right:10px;">{{ user.get_full_name|default:user.username }}</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">خروج</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">
+                    <button id="loginBtn">ورود</button>
+                </a>
+            {% endif %}
         </div>
     </header>
-    
+
     <main>
         {% block content %}
-        
         {% endblock %}
     </main>
-    
+
     <footer class="quick-access">
         <h3>دسترسی سریع</h3>
         <ul>
             <li><a href="#">لینک 1</a></li>
             <li><a href="#">لینک 2</a></li>
             <li><a href="#">لینک 3</a></li>
-            
         </ul>
     </footer>
-    
-    <script>
-        let isLoggedIn = false;
-        
-        function handleLogin() {
-            if (!isLoggedIn) {
-                
-                isLoggedIn = true;
-                document.getElementById('loginBtn').textContent = 'خروج';
-                document.getElementById('loginBtn').onclick = handleLogout;
-                alert('ورود موفقیت‌آمیز!');
-            } else {
-                handleLogout();
-            }
-        }
-        
-        function handleLogout() {
-            isLoggedIn = false;
-            document.getElementById('loginBtn').textContent = 'ورود';
-            document.getElementById('loginBtn').onclick = handleLogin;
-            alert('خروج موفقیت‌آمیز!');
-        }
-        
-        function search() {
-            const query = document.querySelector('.search-box input').value;
-            if (query.trim()) {
-                alert('جستجو برای: ' + query);
-                
-            }
-        }
-    </script>
 </body>
 </html>
