@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}نتایج جستجو{% endblock %}
+
+{% block content %}
+<h2 style="text-align:center; margin-bottom:20px;">نتایج جستجو</h2>
+
+<div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;">
+    {% for doctor in doctors %}
+        <a href="{% url 'doctor_detail' doctor.id %}" style="text-decoration:none; color:inherit;">
+            <div style="border:1px solid #ddd; border-radius:8px; width:250px; text-align:center; padding:15px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                {% if doctor.image %}
+                    <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
+                {% else %}
+                    <img src="{% static 'image/default-doctor.jpg' %}" alt="بدون تصویر" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
+                {% endif %}
+
+                <h3 style="margin:10px 0 5px 0;">{{ doctor.user.get_full_name }}</h3>
+                <p style="margin:5px 0;">تخصص: {{ doctor.field }}</p>
+                {% if doctor.expertise %}
+                    <p style="margin:5px 0; font-size:14px; color:#555;">{{ doctor.expertise }}</p>
+                {% endif %}
+                {% if doctor.offices.exists %}
+                    <p style="margin:5px 0;">تلفن: {{ doctor.offices.first.phone_num }}</p>
+                {% endif %}
+            </div>
+        </a>
+    {% empty %}
+        <p>هیچ دکتری یافت نشد.</p>
+    {% endfor %}
+</div>
+{% endblock %}

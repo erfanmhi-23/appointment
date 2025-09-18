@@ -1,7 +1,7 @@
-version: '3'
 services:
   web:
-    build: .
+    build:
+      context: .
     ports:
       - "8000:8000"
     volumes:
@@ -12,8 +12,9 @@ services:
       - DEBUG=1
     depends_on:
       - db
+
   db:
-    image: postgres:15
+    image: docker.arvancloud.ir/postgres:15
     environment:
       POSTGRES_DB: appointment_db
       POSTGRES_USER: postgres
