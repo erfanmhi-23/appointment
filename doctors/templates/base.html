@@ -4,11 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-    <title>صفحه اصلی</title>
-=======
     <title>{% block title %}صفحه اصلی{% endblock %}</title>
->>>>>>> origin/Erfan
     <style>
         body {
             font-family: 'Tahoma', sans-serif;
@@ -62,10 +58,7 @@
         .login-section {
             display: flex;
             gap: 10px;
-<<<<<<< HEAD
-=======
             align-items: center;
->>>>>>> origin/Erfan
         }
         .login-section button {
             background-color: #0056b3;
@@ -81,20 +74,12 @@
         }
         .menu {
             display: flex;
-<<<<<<< HEAD
-            gap: 20px;
-=======
             gap: 15px;
->>>>>>> origin/Erfan
         }
         .menu a {
             color: white;
             text-decoration: none;
-<<<<<<< HEAD
-            padding: 12px 20px;
-=======
             padding: 10px 15px;
->>>>>>> origin/Erfan
             border-radius: 4px;
             font-size: 16px;
         }
@@ -135,30 +120,6 @@
 <body>
     <header>
         <div class="logo-section">
-<<<<<<< HEAD
-            <img src="{% static 'logo.jpg' %}" alt="لوگو" class="logo">
-            <div class="search-box">
-                <input type="text" placeholder="جستجو...">
-                <button onclick="search()">جستجو</button>
-            </div>
-        </div>
-        <nav class="menu">
-            <a href="{% url 'docto_list' %}">لیست پزشکان </a>
-            <a href="#">گزینه 2</a>
-            <a href="#">گزینه 3</a>
-        </nav>
-        <div class="login-section" id="loginSection">
-            <button id="loginBtn" onclick="handleLogin()">ورود</button>
-        </div>
-    </header>
-    
-    <main>
-        {% block content %}
-        
-        {% endblock %}
-    </main>
-    
-=======
             <img src="{% static 'image/logo.jpg' %}" alt="لوگو" class="logo">
 
             <form method="get" action="{% url 'doctor_search' %}" class="search-box">
@@ -199,53 +160,13 @@
         {% endblock %}
     </main>
 
->>>>>>> origin/Erfan
     <footer class="quick-access">
         <h3>دسترسی سریع</h3>
         <ul>
             <li><a href="#">لینک 1</a></li>
             <li><a href="#">لینک 2</a></li>
             <li><a href="#">لینک 3</a></li>
-<<<<<<< HEAD
-            
-        </ul>
-    </footer>
-    
-    <script>
-        let isLoggedIn = false;
-        
-        function handleLogin() {
-            if (!isLoggedIn) {
-                
-                isLoggedIn = true;
-                document.getElementById('loginBtn').textContent = 'خروج';
-                document.getElementById('loginBtn').onclick = handleLogout;
-                alert('ورود موفقیت‌آمیز!');
-            } else {
-                handleLogout();
-            }
-        }
-        
-        function handleLogout() {
-            isLoggedIn = false;
-            document.getElementById('loginBtn').textContent = 'ورود';
-            document.getElementById('loginBtn').onclick = handleLogin;
-            alert('خروج موفقیت‌آمیز!');
-        }
-        
-        function search() {
-            const query = document.querySelector('.search-box input').value;
-            if (query.trim()) {
-                alert('جستجو برای: ' + query);
-                
-            }
-        }
-    </script>
-</body>
-</html>
-=======
         </ul>
     </footer>
 </body>
 </html>
->>>>>>> origin/Erfan
