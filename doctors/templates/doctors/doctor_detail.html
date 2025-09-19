@@ -8,7 +8,7 @@
     {% if doctor.image %}
         <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" style="width:100%; height:300px; object-fit:cover; border-radius:8px;">
     {% else %}
-        <img src="{% static 'image/default-doctor.jpg' %}" alt="بدون تصویر" style="width:100%; height:300px; object-fit:cover; border-radius:8px;">
+        <img src="{% static 'image/default_doctor.jpg' %}" alt="بدون تصویر" style="width:100%; height:300px; object-fit:cover; border-radius:8px;">
     {% endif %}
 
     <h2>{{ doctor.user.get_full_name }}</h2>
@@ -25,7 +25,21 @@
             <li>دفتر ثبت نشده است.</li>
         {% endfor %}
     </ul>
-
+    <form method="post" action="{% url 'add_comment' doctor.id %}" style="text-align:right;">
+    {% csrf_token %}
+    <textarea name="comment_text" rows="4" style="width:100%; padding:10px; border-radius:4px; border:1px solid #ccc;" placeholder="نظر خود را وارد کنید..."></textarea>
+    <label for="rating">امتیاز:</label>
+    <select name="rating" id="rating" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    <!-- اگر visit_time_id را دارید اضافه کنید اینجا -->
+    <!-- <input type="hidden" name="visit_time_id" value="{{ visit_time.id }}"> -->
+    <button type="submit" style="margin-top:10px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:4px;">ارسال نظر</button>
+</form>
     <a href="{% url 'doctor_list' %}" style="display:inline-block; margin-top:20px; padding:10px 20px; background:#007bff; color:white; border-radius:4px; text-decoration:none;">بازگشت به لیست</a>
 </div>
 {% endblock %}
