@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}تأیید ایمیل{% endblock %}
+
+{% block content %}
+  <h2>کد ارسال‌شده به ایمیل را وارد کنید</h2>
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="code" placeholder="کد OTP" required>
+    <button type="submit">تأیید</button>
+  </form>
+{% endblock %}
