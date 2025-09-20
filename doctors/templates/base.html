@@ -121,7 +121,6 @@
     <header>
         <div class="logo-section">
             <img src="{% static 'image/logo.jpg' %}" alt="لوگو" class="logo">
-
             <form method="get" action="{% url 'doctor_search' %}" class="search-box">
                 <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص...">
                 <button type="submit">جستجو</button>
@@ -132,7 +131,6 @@
             <a href="{% url 'doctor_list' %}">لیست پزشکان</a>
             <a href="#">گزینه 2</a>
             <a href="#">گزینه 3</a>
-
             {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'add_doctor' %}" style="background-color:#ffc107;">اضافه کردن دکتر</a>
                 <a href="{% url 'timesheet_list' %}" style="background-color:#28a745;">مدیریت تایم‌شیت‌ها</a>
@@ -153,6 +151,8 @@
                 </a>
                 <a href="{% url 'sign_up' %}">
                     <button id="loginBtn">ایجاد حساب کاربری </button>
+                <a href="{% url 'send_email_otp' %}">
+                    <button id="emailLoginBtn" style="background-color:#28a745;">ورود با ایمیل</button>
                 </a>
             {% endif %}
         </div>

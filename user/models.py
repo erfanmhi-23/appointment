@@ -13,3 +13,26 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+####email otp
+from django.db import models
+from django.utils import timezone
+import datetime
+import random
+
+class EmailOTP(models.Model):
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False) 
+
+    def __str__(self):
+        return f"{self.email} - {self.code}"
+    
+    def is_expired(self):
+        return timezone.now() > self.created_at + datetime.timedelta(minutes=5)
+    
+    def generate_otp():
+        return f"{random.randint(100000, 999999)}"
+
+                
+
