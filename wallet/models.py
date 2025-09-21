@@ -12,6 +12,6 @@ class Wallet(models.Model):
     )
     inventory = models.PositiveBigIntegerField(
         validators=[MaxValueValidator(999999999999999)]   # 15 digit
-
+    )
     def __str__(self):
         return f"{self.user.get_full_name()} with {self.inventory}"
