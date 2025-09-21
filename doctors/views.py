@@ -121,11 +121,6 @@ def add_doctor(request):
 
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-<<<<<<< HEAD
-    return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})
-
-
-=======
 
     
     timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
@@ -134,4 +129,3 @@ def doctor_detail(request, doctor_id):
         'doctor': doctor,
         'timesheets': timesheets,
     })
->>>>>>> origin/hossein
