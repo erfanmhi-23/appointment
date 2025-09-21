@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Doctor
+from .models import Doctor , Office , Timesheet
+
 
 User = get_user_model()
 
@@ -33,3 +34,20 @@ class DoctorCreateForm(forms.ModelForm):
         if commit:
             doctor.save()
         return doctor
+
+class OfficeForm(forms.ModelForm):
+    class Meta:
+        model = Office
+        fields = ['location', 'phone_num', 'price']
+
+class TimesheetForm(forms.ModelForm):
+    class Meta:
+        model = Timesheet
+        fields = ['start', 'end', 'duration']
+        widgets = {
+            'start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'duration': forms.NumberInput(attrs={'min': 0}),
+        }
+    
+

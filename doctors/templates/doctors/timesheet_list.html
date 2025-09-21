@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+ <h1>لیست دفاتر پزشکان</h1>
+    <ul>
+        {% for office in offices %}
+            <li>
+                <a href="{% url 'office_detail' office.id %}">
+                    {{ office.doctor }} - {{ office.location }}
+                </a>
+            </li>
+        {% empty %}
+            <li>دفتر ثبت نشده است.</li>
+        {% endfor %}
+{% endblock %}

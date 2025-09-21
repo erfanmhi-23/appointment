@@ -52,4 +52,4 @@ class Visittime(models.Model):
         unique_together = ("doctor", "duration_start")
 
     def __str__(self):
-        return f"{self.doctor} - {self.duration_start} ({self.status})"
+        return f"{self.doctor} - {self.duration_start} "
