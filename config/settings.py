@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user' ,
+    'patient',
+    'review',
     'doctors',
 ]
 AUTH_USER_MODEL = "user.User"
@@ -146,3 +148,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'djangop065@gmail.com'
 EMAIL_HOST_PASSWORD = 'zjjj mxcg fsgz rybl'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+LOGIN_REDIRECT_URL = '/'  
+LOGOUT_REDIRECT_URL = '/' 
+
