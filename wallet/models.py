@@ -1,14 +1,17 @@
 from django.db import models
-from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 User = settings.AUTH_USER_MODEL
-# Create your models here.
-class wallet(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
-    cart_num= models.PositiveIntegerFiel(max_length=16)
-    inventory= models.PositiveIntegerField(max_length=15)
 
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
+    cart_num = models.PositiveBigIntegerField(
+        validators=[MaxValueValidator(9999999999999999)]  # 16 digit
+    )
+    inventory = models.PositiveBigIntegerField(
+        validators=[MaxValueValidator(999999999999999)]   # 15 digit
 
     def __str__(self):
-        return f"{self.user.get_full_name()} with {self.inventory} ({self.balance})"
+        return f"{self.user.get_full_name()} with {self.inventory}"
