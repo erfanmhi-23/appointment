@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}صفحه اصلی{% endblock %}</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+        .search-box {
+            display: flex;
+            background-color: white;
+            border-radius: 20px;
+            padding: 5px;
+            width: 200px;
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 8px 12px;
+            flex: 1;
+            border-radius: 15px;
+            font-size: 14px;
+            direction: rtl;
+        }
+        .search-box button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        .login-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .login-section button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-section button:hover {
+            background-color: #004085;
+        }
+        .menu {
+            display: flex;
+            gap: 15px;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        .quick-access {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        .quick-access ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .quick-access li a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 10px 20px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+        }
+        .quick-access li a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-section">
+            <img src="{% static 'image/logo.jpg' %}" alt="لوگو" class="logo">
+
+            <form method="get" action="{% url 'doctor_search' %}" class="search-box">
+                <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص...">
+                <button type="submit">جستجو</button>
+            </form>
+        </div>
+
+        <nav class="menu">
+            <a href="{% url 'doctor_list' %}">لیست پزشکان</a>
+            <a href="#">گزینه 2</a>
+            <a href="#">گزینه 3</a>
+
+            {% if user.is_authenticated and user.is_staff %}
+                <a href="{% url 'add_doctor' %}" style="background-color:#ffc107;">اضافه کردن دکتر</a>
+                <a href="{% url 'timesheet_list' %}" style="background-color:#28a745;">مدیریت تایم‌شیت‌ها</a>
+                <a href="{% url 'office_list' %}" style="background-color:#17a2b8;">مدیریت دفاتر</a>
+            {% endif %}
+        </nav>
+
+        <div class="login-section" id="loginSection">
+            {% if user.is_authenticated %}
+                <span style="margin-right:10px;">{{ user.get_full_name|default:user.username }}</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">خروج</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">
+                    <button id="loginBtn">ورود</button>
+                </a>
+                <a href="{% url 'sign_up' %}">
+                    <button id="loginBtn">ایجاد حساب کاربری </button>
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="quick-access">
+        <h3>دسترسی سریع</h3>
+        <ul>
+            <li><a href="#">لینک 1</a></li>
+            <li><a href="#">لینک 2</a></li>
+            <li><a href="#">لینک 3</a></li>
+        </ul>
+    </footer>
+</body>
+</html>
