@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.contrib.auth import get_user_model, login
 from .forms import EmailForm
 from .models import EmailOTP
+from django.http import HttpResponse
 
 ###email otp 
 User = get_user_model()
@@ -49,3 +50,10 @@ def verify_email_otp(request):
         messages.success(request, "ورود موفقیت‌آمیز بود.")
         return redirect("home")
     return render(request, "user/verify_email_otp.html")
+
+def google_callback(request):
+    code = request.GET.get('code')
+    if not code:
+        return HttpResponse("کد OAuth گوگل پیدا نشد!")
+
+    return HttpResponse(f"ورود با گوگل موفق! کد برگشتی گوگل: {code}")

@@ -9,7 +9,6 @@ from .forms import DoctorCreateForm
 
 
 
-
 def doctor_list(request):
     doctors = Doctor.objects.all()
     paginator = Paginator(doctors, 10)
@@ -86,3 +85,5 @@ def add_doctor(request):
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
     return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})
+
+
