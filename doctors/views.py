@@ -5,7 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.core.paginator import Paginator
-from .forms import DoctorCreateForm
+from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
 
 
 
@@ -36,10 +36,47 @@ def doctor_search(request):
         doctors = Doctor.objects.all()
 
     return render(request, 'doctors/doctor_search.html', {'doctors': doctors, 'query': query})
+
 @staff_member_required
 def timesheet_list(request):
-    timesheets = Timesheet.objects.all()
-    return render(request, 'doctors/timesheet_list.html', {'timesheets':timesheets})
+    offices = Office.objects.select_related('doctor__user').all()
+    return render(request, 'doctors/timesheet_list.html', {'offices': offices})
+
+@staff_member_required
+def office_detail(request, office_id):
+    office = get_object_or_404(Office, id=office_id)
+    timesheets = office.time_sheets.all().order_by('start')
+    return render(request, 'doctors/office_detail.html', {'office': office, 'timesheets': timesheets})
+
+@staff_member_required
+def office_edit(request, office_id):
+    office = get_object_or_404(Office, id=office_id)
+
+    if request.method == 'POST':
+        form = OfficeForm(request.POST, instance=office)
+        if form.is_valid():
+            form.save()
+            return redirect('office_detail', office_id=office.id)
+    else:
+        form = OfficeForm(instance=office)
+
+    return render(request, 'doctors/office_edit.html', {'form': form, 'office': office})
+
+
+@staff_member_required
+def timesheet_edit(request, timesheet_id):
+    timesheet = get_object_or_404(Timesheet, id=timesheet_id)
+
+    if request.method == 'POST':
+        form = TimesheetForm(request.POST, instance=timesheet)
+        if form.is_valid():
+            form.save()
+            return redirect('timesheet_list')
+    else:
+        form = TimesheetForm(instance=timesheet)
+
+    return render(request, 'doctors/timesheet_edit.html', {'form': form, 'timesheet': timesheet})
+
 
 def doctor_free_times(request, doctor_id):
     free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
@@ -65,7 +102,7 @@ def cancel_visit_time(request, visit_id):
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'home.html')
 
 def is_admin(user):
     return user.is_superuser or user.groups.filter(name='Admins').exists()
@@ -84,6 +121,17 @@ def add_doctor(request):
 
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
+<<<<<<< HEAD
     return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})
 
 
+=======
+
+    
+    timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
+
+    return render(request, 'doctors/doctor_detail.html', {
+        'doctor': doctor,
+        'timesheets': timesheets,
+    })
+>>>>>>> origin/hossein

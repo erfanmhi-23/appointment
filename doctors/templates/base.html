@@ -36,7 +36,7 @@
             background-color: white;
             border-radius: 20px;
             padding: 5px;
-            width: 200px;
+            width: 300px;
         }
         .search-box input {
             border: none;
@@ -51,7 +51,7 @@
             background-color: #0056b3;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 8px 20px;
             border-radius: 15px;
             cursor: pointer;
         }
@@ -118,6 +118,32 @@
             background-color: #007bff;
             color: white;
         }
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            }
+
+        .btn:hover {
+            background-color: #0056b3;
+            }
+
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 12px;
+            }
+
+        .ml-2 {
+            margin-left: 8px;
+            }
+
+        .mb-3 {
+            margin-bottom: 16px;
+            }
     </style>
 </head>
 <body>
@@ -125,14 +151,19 @@
         <div class="logo-section">
             <img src="{% static 'image/logo.jpg' %}" alt="لوگو" class="logo">
             <form method="get" action="{% url 'doctor_search' %}" class="search-box">
-                <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص...">
+                <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص پزشک ...">
                 <button type="submit">جستجو</button>
             </form>
         </div>
 
         <nav class="menu">
             <a href="{% url 'doctor_list' %}">لیست پزشکان</a>
+<<<<<<< HEAD
             <a href="#">گزینه 2</a>
+=======
+            <a href="#">نزدیک ترین پزشکان</a>
+            <a href="#"></a>
+>>>>>>> origin/hossein
             {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'add_doctor' %}" style="background-color:#ffc107;">اضافه کردن دکتر</a>
                 <a href="{% url 'timesheet_list' %}" style="background-color:#28a745;">مدیریت تایم‌شیت‌ها</a>
@@ -151,6 +182,7 @@
                 <a href="{% url 'login' %}">
                     <button>ورود</button>
                 </a>
+<<<<<<< HEAD
                 
                 <a href="{% url 'send_email_otp' %}">
                     <button style="background-color:#28a745;">ورود با ایمیل</button>
@@ -162,6 +194,12 @@
 
                 <a href="{% url 'sign_up' %}">
                     <button>ایجاد حساب کاربری</button>
+=======
+                <a href="{% url 'sign_up' %}">
+                    <button id="loginBtn">ایجاد حساب کاربری </button>
+                <a href="{% url 'send_email_otp' %}">
+                    <button id="emailLoginBtn" style="background-color:#28a745;">ورود با ایمیل</button>
+>>>>>>> origin/hossein
                 </a>
             {% endif %}
         </div>
@@ -175,9 +213,9 @@
     <footer class="quick-access">
         <h3>دسترسی سریع</h3>
         <ul>
-            <li><a href="#">لینک 1</a></li>
-            <li><a href="#">لینک 2</a></li>
-            <li><a href="#">لینک 3</a></li>
+            <li><a href="#">سایت دکترتو </a></li>
+            <li><a href="#">سایت نوبت دات آی آر</a></li>
+            <li><a href="#">سایت پذیرش 24</a></li>
         </ul>
     </footer>
 </body>

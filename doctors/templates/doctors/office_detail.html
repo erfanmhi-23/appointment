@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+   <h1>دفتر دکتر {{ office.doctor }}</h1>
+    <p>مکان: {{ office.location }}</p>
+    <p>شماره تماس: {{ office.phone_num }}</p>
+    <p>قیمت ویزیت: {{ office.price }}</p>
+    <a href="{% url 'office_edit' office.id %}" class="btn btn-primary mb-3">ویرایش دفتر</a>
+    <h2>تایم‌شیت‌ها</h2>
+    <ul>
+        
+        {% for ts in timesheets %}
+    <li>
+        شروع: {{ ts.start }} - پایان: {{ ts.end }} (مدت: {{ ts.duration }} دقیقه)
+         <a href="{% url 'timesheet_edit' ts.id %}" class="btn btn-sm btn-secondary ml-2">ویرایش تایم شیت</a>
+    </li>
+{% empty %}
+    <li>تایم‌شیتی برای این دفتر ثبت نشده است.</li>
+{% endfor %}
+    </ul>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>ویرایش دفتر دکتر {{ office.doctor }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ذخیره تغییرات</button>
+    </form>
+
+    <a href="{% url 'office_detail' office.id %}">بازگشت به جزئیات دفتر</a>
+
+{% endblock %}

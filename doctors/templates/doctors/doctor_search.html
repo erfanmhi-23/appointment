@@ -13,7 +13,7 @@
                 {% if doctor.image %}
                     <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
                 {% else %}
-                    <img src="{% static 'image/default-doctor.jpg' %}" alt="بدون تصویر" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
+                    <img src="{% static 'image/default_doctor.jpg' %}" alt="بدون تصویر" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
                 {% endif %}
 
                 <h3 style="margin:10px 0 5px 0;">{{ doctor.user.get_full_name }}</h3>

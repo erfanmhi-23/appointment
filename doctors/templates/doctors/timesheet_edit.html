@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1> ویرایش تایم شیت</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ذخیره تغییرات</button>
+    </form>
+
+    <a href="{% url 'timesheet_list'  %}">بازگشت به لیست دفاتر</a>
+
+{% endblock %}
