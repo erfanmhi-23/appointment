@@ -125,3 +125,19 @@ def verify_email_otp(request):
         messages.success(request, "ورود موفقیت‌آمیز بود.")
         return redirect("home")
     return render(request, "user/verify_email_otp.html")
+
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput)
+    
+@login_required
+def delete_account(request):
+    form = DeleteAccountForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        if not request.user.check_password(form.cleaned_data["password"]):
+            form.add_error("password", "رمز عبور اشتباه است.")
+        else:
+            logout(request)
+            request.user.delete()
+            return redirect("user:signup")
+    return render(request, "user/delete_account.html", {"form": form})
