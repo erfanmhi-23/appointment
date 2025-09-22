@@ -1,1 +1,15 @@
-
+{% block title %}ورود{% endblock %}
+{% block content %}
+<h1>ورود</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {{ form.as_p }}
+  <button type="submit">ورود</button>
+</form>
+<p>
+  <a href="{% url 'user:password_reset' %}">فراموشی رمز؟</a> |
+  <a href="{% url 'user:signup' %}">ثبت‌نام</a> |
+  <a href="{% url 'user:send_email_otp' %}">ورود با ایمیل (OTP)</a>
+</p>
+{% endblock %}
