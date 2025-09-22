@@ -150,4 +150,6 @@ EMAIL_HOST_PASSWORD = 'zjjj mxcg fsgz rybl'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_REDIRECT_URL = '/'  
 LOGOUT_REDIRECT_URL = '/' 
-
+#################
+GOOGLE_CLIENT_ID = "1017978674796-eioru30jaop3eouk89dsq288i1kcdq1e.apps.googleusercontent.com"
+GOOGLE_REDIRECT_URI = "http://localhost:8000/accounts/google/login/callback/"
