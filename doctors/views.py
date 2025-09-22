@@ -11,10 +11,21 @@ from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
 
 def doctor_list(request):
     doctors = Doctor.objects.all()
+    field = request.GET.get("field")
+    location = request.GET.get("location")
+    if field:
+        doctors = doctors.filter(field__icontains=field)
+
+    if location:
+        doctors = doctors.filter(offices__location__icontains=location).distinct()
     paginator = Paginator(doctors, 10)
     page_num = request.GET.get("page")
     page_obj = paginator.get_page(page_num)
-    return render(request, 'doctors/doctor_list.html', {'page_obj': page_obj})
+    return render(request, 'doctors/doctor_list.html', {
+        'page_obj': page_obj,
+        'field': field,
+        'location': location,
+    })
 
 def office_list(request):
     location = request.GET.get('location')
