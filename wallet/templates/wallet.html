@@ -1,0 +1,41 @@
+{% extends 'base.html' %}{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">💳 کیف پول من</h2>
+
+    <!-- پیام‌های موفق یا خطا -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert 
+                {% if message.tags == 'success' %}alert-success
+                {% elif message.tags == 'error' %}alert-danger
+                {% else %}alert-info{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- اطلاعات کیف پول -->
+    <div class="card">
+        <div class="card-body">
+            <p><strong>شماره کارت:</strong> {{ wallet.cart_num }}</p>
+            <p><strong>موجودی:</strong> {{ wallet.inventory }} تومان</p>
+        </div>
+    </div>
+
+    <!-- اگر ویزیت خاصی داری -->
+    {% if visit %}
+        <div class="mt-4">
+            <h5>پرداخت هزینه ویزیت</h5>
+            <p>دکتر: {{ visit.doctor.user.get_full_name }}</p>
+            <p>هزینه: {{ visit.doctor.office.price }} تومان</p>
+
+            <a href="{% url 'wallet_pay' visit.id %}" class="btn btn-success">
+                پرداخت
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
