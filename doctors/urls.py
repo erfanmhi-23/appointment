@@ -17,5 +17,5 @@ urlpatterns = [
     path('office/<int:timesheet_id>/edit/timesheet', views.timesheet_edit, name='timesheet_edit'),
     path('doctor/<int:doctor_id>/add-comment/', add_comment, name='add_comment'),
     path('doctor/<int:doctor_id>/', views.doctor_detail, name='doctor_detail'),
-    
+    path('showtimesheet/<int:doctor_id>/' , views.available_times_for_doctor, name='show_timesheet')    
 ]

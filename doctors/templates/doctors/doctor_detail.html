@@ -12,11 +12,11 @@
     <h4>دفتر: {{ office.location }}</h4>
     {% for timesheet in office.time_sheets.all %}
         <div style="background:white; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+            <p>نزدیکترین نوبت</p>
             <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
-            <p>ساعت شروع: {{ timesheet.start|time:"H:i" }}</p>
-            <p>ساعت پایان: {{ timesheet.end|time:"H:i" }}</p>
-            <p>مدت: {{ timesheet.duration }} دقیقه</p>
+            <p>ساعت : {{ timesheet.start|time:"H:i" }}</p>
             <a href="#" style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">رزرو نوبت</a>
+            <a href="{% url 'show_timesheet' doctor.id %} " style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">نوبت های بیشتر </a>
         </div>
         {% empty %}
             <p>تایم‌شیتی برای این دفتر ثبت نشده است.</p>
