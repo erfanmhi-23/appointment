@@ -8,7 +8,6 @@ from django.core.paginator import Paginator
 from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
 
 
-
 def doctor_list(request):
     doctors = Doctor.objects.all()
     field = request.GET.get("field")
@@ -140,3 +139,4 @@ def doctor_detail(request, doctor_id):
         'doctor': doctor,
         'timesheets': timesheets,
     })
+
