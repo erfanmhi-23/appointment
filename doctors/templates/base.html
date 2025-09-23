@@ -162,7 +162,6 @@
             {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'add_doctor' %}" style="background-color:#ffc107;">اضافه کردن دکتر</a>
                 <a href="{% url 'timesheet_list' %}" style="background-color:#28a745;">مدیریت تایم‌شیت‌ها</a>
-                <a href="{% url 'office_list' %}" style="background-color:#17a2b8;">مدیریت دفاتر</a>
             {% endif %}
         </nav>
 

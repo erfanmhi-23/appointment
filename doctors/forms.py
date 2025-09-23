@@ -45,6 +45,11 @@ class OfficeForm(forms.ModelForm):
     class Meta:
         model = Office
         fields = ['location', 'phone_num', 'price']
+        labels = {
+            'location':'مکان',
+            'phone_num': 'شماره تلفن',
+            'price':'قیمت'
+        }
 
 class TimesheetForm(forms.ModelForm):
     class Meta:
