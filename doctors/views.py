@@ -16,13 +16,18 @@ def doctor_list(request):
     page_obj = paginator.get_page(page_num)
     return render(request, 'doctors/doctor_list.html', {'page_obj': page_obj})
 
-def office_list(request):
-    location = request.GET.get('location')
-    if location:
-        offices = Office.objects.filter(location__icontains = location)
-    else:
-        offices = Office.objects.all()
-    return render(request, 'doctors/office_list.html',{'offices': offices})
+
+def doctor_detail(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+
+    
+    timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
+
+    return render(request, 'doctors/doctor_detail.html', {
+        'doctor': doctor,
+        'timesheets': timesheets,
+    })
+
 
 def doctor_search(request):
     query = request.GET.get('q', '')
@@ -37,16 +42,21 @@ def doctor_search(request):
 
     return render(request, 'doctors/doctor_search.html', {'doctors': doctors, 'query': query})
 
-@staff_member_required
-def timesheet_list(request):
-    offices = Office.objects.select_related('doctor__user').all()
-    return render(request, 'doctors/timesheet_list.html', {'offices': offices})
+def office_list(request):
+    location = request.GET.get('location')
+    if location:
+        offices = Office.objects.filter(location__icontains = location)
+    else:
+        offices = Office.objects.all()
+    return render(request, 'doctors/office_list.html',{'offices': offices})
+
 
 @staff_member_required
 def office_detail(request, office_id):
     office = get_object_or_404(Office, id=office_id)
     timesheets = office.time_sheets.all().order_by('start')
     return render(request, 'doctors/office_detail.html', {'office': office, 'timesheets': timesheets})
+
 
 @staff_member_required
 def office_edit(request, office_id):
@@ -61,6 +71,12 @@ def office_edit(request, office_id):
         form = OfficeForm(instance=office)
 
     return render(request, 'doctors/office_edit.html', {'form': form, 'office': office})
+
+
+@staff_member_required
+def timesheet_list(request):
+    offices = Office.objects.select_related('doctor__user').all()
+    return render(request, 'doctors/timesheet_list.html', {'offices': offices})
 
 
 @staff_member_required
@@ -82,6 +98,7 @@ def doctor_free_times(request, doctor_id):
     free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
     return render(request, 'doctors/doctor_free_times.html', {'free_times': free_times})
 
+
 @login_required
 def reserve_visit_time(request, visit_id):
     visit_time = get_object_or_404(Visittime, id=visit_id, patient__isnull=True, canceled_at__isnull=True)
@@ -92,6 +109,7 @@ def reserve_visit_time(request, visit_id):
         return redirect('doctor_free_times', doctor_id=visit_time.doctor.id)
     return render(request, 'doctors/reserve_visit_time.html', {'visit_time': visit_time})
 
+
 @login_required
 def cancel_visit_time(request, visit_id):
     visit_time = get_object_or_404(Visittime, id=visit_id, patient=request.user, canceled_at__isnull=True)
@@ -101,8 +119,10 @@ def cancel_visit_time(request, visit_id):
         return redirect('doctor_free_times', doctor_id=visit_time.doctor.id)
     return render(request, 'doctors/cancel_visit_time.html', {'visit_time': visit_time})
 
+
 def home(request):
     return render(request, 'home.html')
+
 
 def is_admin(user):
     return user.is_superuser or user.groups.filter(name='Admins').exists()
@@ -119,13 +139,4 @@ def add_doctor(request):
         form = DoctorCreateForm()
     return render(request, 'doctors/add_doctor.html', {'form': form})
 
-def doctor_detail(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
 
-    
-    timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
-
-    return render(request, 'doctors/doctor_detail.html', {
-        'doctor': doctor,
-        'timesheets': timesheets,
-    })
