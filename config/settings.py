@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'patient',
     'review',
     'doctors',
+    'wallet',
 ]
 AUTH_USER_MODEL = "user.User"
 
