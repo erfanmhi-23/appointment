@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>زمان‌های خالی برای دکتر</h2>
+<ul>
+  {% for timesheet in available_timesheets %}
+    <li>
+      {{ timesheet.office.location }} | {{ timesheet.start }} تا {{ timesheet.end }}
+    </li>
+  {% empty %}
+    <li>هیچ زمانی در حال حاضر آزاد نیست.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

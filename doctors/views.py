@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
-
+from doctors.services import get_available_timesheets_for_doctor
 
 def doctor_list(request):
     doctors = Doctor.objects.all()
@@ -52,6 +52,12 @@ def doctor_search(request):
 
     return render(request, 'doctors/doctor_search.html', {'doctors': doctors, 'query': query})
 
+
+def doctor_free_times(request, doctor_id):
+    free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
+    return render(request, 'doctors/doctor_free_times.html', {'free_times': free_times})
+
+
 def office_list(request):
     location = request.GET.get('location')
     if location:
@@ -89,6 +95,14 @@ def timesheet_list(request):
     return render(request, 'doctors/timesheet_list.html', {'offices': offices})
 
 
+def available_times_for_doctor(request, doctor_id):
+    available_timesheets = get_available_timesheets_for_doctor(doctor_id)
+    context = {
+        "doctor_id": doctor_id,
+        "available_timesheets": available_timesheets
+    }
+    return render(request, "doctors/show_timesheet.html", context)
+
 @staff_member_required
 def timesheet_edit(request, timesheet_id):
     timesheet = get_object_or_404(Timesheet, id=timesheet_id)
@@ -104,9 +118,7 @@ def timesheet_edit(request, timesheet_id):
     return render(request, 'doctors/timesheet_edit.html', {'form': form, 'timesheet': timesheet})
 
 
-def doctor_free_times(request, doctor_id):
-    free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
-    return render(request, 'doctors/doctor_free_times.html', {'free_times': free_times})
+
 
 
 @login_required
@@ -150,3 +162,6 @@ def add_doctor(request):
     return render(request, 'doctors/add_doctor.html', {'form': form})
 
 
+@login_required
+def book_visit(request,doctor_id) :
+    doctor = get_object_or_404 (Doctor , id=doctor_id)
