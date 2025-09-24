@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect 
 from doctors.models import Doctor,Office,Timesheet,Visittime
-from django.db.models import Q
+from django.db.models import Q , F
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
@@ -8,10 +9,11 @@ from django.core.paginator import Paginator
 from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
 from doctors.services import get_available_timeslots_for_doctor
 from django.utils.dateparse import parse_datetime
-from django.http import HttpResponseBadRequest , HttpResponseRedirect
-from django.contrib.auth import login , get_user_model
+from django.http import HttpResponseBadRequest
+from django.db.models import OuterRef, Exists
+from django.contrib import messages
+from wallet.models import Wallet
 
-User = get_user_model()
 
 def doctor_list(request):
     doctors = Doctor.objects.all()
@@ -34,9 +36,21 @@ def doctor_list(request):
 
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-
-    
-    timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
+    unbooked_visits = Visittime.objects.filter(
+        doctor=doctor,
+        office=OuterRef('office'),
+        booked_at__isnull=True,  
+        canceled_at__isnull=True,
+        duration_start__lt=OuterRef('end'),
+        duration_end__gt=OuterRef('start'),
+    )
+    timesheets = Timesheet.objects.filter(
+        office__doctor=doctor
+    ).annotate(
+        has_unbooked_visit=Exists(unbooked_visits)
+    ).filter(
+        has_unbooked_visit=True
+    ).order_by('start')
 
     return render(request, 'doctors/doctor_detail.html', {
         'doctor': doctor,
@@ -57,12 +71,12 @@ def doctor_search(request):
 
     return render(request, 'doctors/doctor_search.html', {'doctors': doctors, 'query': query})
 
-
+##del
 def doctor_free_times(request, doctor_id):
     free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
     return render(request, 'doctors/doctor_free_times.html', {'free_times': free_times})
 
-
+##del
 def office_list(request):
     location = request.GET.get('location')
     if location:
@@ -82,7 +96,6 @@ def office_detail(request, office_id):
 @staff_member_required
 def office_edit(request, office_id):
     office = get_object_or_404(Office, id=office_id)
-
     if request.method == 'POST':
         form = OfficeForm(request.POST, instance=office)
         if form.is_valid():
@@ -164,6 +177,14 @@ def reserve_visit_time(request,doctor_id):
         duration_end=end,
         booked_at=timezone.now(),
     )
+    price = office.price
+    wallet = get_object_or_404(Wallet, user=request.user)
+    if wallet.inventory >= price:
+            # کم کردن موجودی
+        Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
+        
+    else:
+        redirect('home')
 
     return render(request, 'doctors/reserve_time.html')
 

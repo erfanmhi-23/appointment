@@ -3,7 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import F
 from .models import Wallet
-from doctors.models import Visittime  # مطمئن شو اسم مدل درست است
+from doctors.models import Doctor,Office,Visittime  # مطمئن شو اسم مدل درست است
+
+
+
+
+
+
+
+
+
 
 @login_required
 def wallet_view(request, visit_id=None):
