@@ -237,4 +237,13 @@ def google_callback(request):
 
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-    return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})
+    doctor_times = Visittime.objects.filter(
+        doctor=doctor,
+        booked_at__isnull=True,
+        canceled_at__isnull=True,
+        review__isnull=True
+    )
+    return render(request, 'doctors/doctor_detail.html', {
+        'doctor': doctor,
+        'doctor_times': doctor_times
+    })
