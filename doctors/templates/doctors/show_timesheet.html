@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>زمان‌های خالی برای دکتر</h2>
-<ul>
-  {% for timesheet in available_timesheets %}
-    <li>
-      {{ timesheet.office.location }} | {{ timesheet.start }} تا {{ timesheet.end }}
-    </li>
-  {% empty %}
-    <li>هیچ زمانی در حال حاضر آزاد نیست.</li>
-  {% endfor %}
-</ul>
+{% for timesheet, slots in timesheet_slots.items %}
+  <h4>دفتر: {{ timesheet.office.location }}</h4>
+  <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
+  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+    {% for slot in slots %}
+      <div style="border:1px solid #ccc; padding:8px; border-radius:4px; min-width:110px; text-align:center;">
+        {{ slot.start|time:"H:i" }} - {{ slot.end|time:"H:i" }}<br>
+        <a href="{% url 'reserve_visit_time' doctor_id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">رزرو نوبت</a>
+      </div>
+    {% endfor %}
+  </div>
+{% empty %}
+  <p>زمان آزاد موجود نیست.</p>
+{% endfor %}
+
 
 {% endblock %}

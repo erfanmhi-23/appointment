@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect , HttpResponse
 from doctors.models import Doctor,Office,Timesheet,Visittime
 from django.db.models import Q
 from django.contrib.admin.views.decorators import staff_member_required
@@ -6,8 +6,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
-from doctors.services import get_available_timesheets_for_doctor
-
+from doctors.services import get_available_timeslots_for_doctor
+from django.utils.dateparse import parse_datetime
+from django.http import HttpResponseBadRequest
 
 def doctor_list(request):
     doctors = Doctor.objects.all()
@@ -97,12 +98,14 @@ def timesheet_list(request):
 
 
 def available_times_for_doctor(request, doctor_id):
-    available_timesheets = get_available_timesheets_for_doctor(doctor_id)
-    context = {
-        "doctor_id": doctor_id,
-        "available_timesheets": available_timesheets
-    }
-    return render(request, "doctors/show_timesheet.html", context)
+    timesheet_slots = get_available_timeslots_for_doctor(doctor_id)
+
+    return render(request, 'doctors/show_timesheet.html', {
+        'doctor_id': doctor_id,
+        'timesheet_slots': timesheet_slots,
+    })
+
+
 
 @staff_member_required
 def timesheet_edit(request, timesheet_id):
@@ -120,17 +123,48 @@ def timesheet_edit(request, timesheet_id):
 
 
 
-
-
 @login_required
-def reserve_visit_time(request, visit_id):
-    visit_time = get_object_or_404(Visittime, id=visit_id, patient__isnull=True, canceled_at__isnull=True)
-    if request.method == "POST":
-        visit_time.patient = request.user
-        visit_time.booked_at = timezone.now()
-        visit_time.save()
-        return redirect('doctor_free_times', doctor_id=visit_time.doctor.id)
-    return render(request, 'doctors/reserve_visit_time.html', {'visit_time': visit_time})
+def reserve_visit_time(request,doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    office = doctor.offices.first()
+    patient = request.user
+
+    
+    start_str = request.GET.get('start')
+    end_str = request.GET.get('end')
+
+    if not start_str or not end_str:
+        return HttpResponseBadRequest("پارامترهای زمان ارسال نشده‌اند.")
+
+    start = parse_datetime(start_str)
+    end = parse_datetime(end_str)
+
+    if not start or not end:
+        return HttpResponseBadRequest("فرمت زمان معتبر نیست.")
+        
+
+    
+    already_reserved = Visittime.objects.filter(
+        doctor=doctor,
+        office=office,
+        duration_start=start,
+        canceled_at__isnull=True
+    ).exists()
+
+    if already_reserved:
+        return HttpResponseBadRequest("این زمان قبلاً رزرو شده است.")
+
+    Visittime.objects.create(
+        doctor=doctor,
+        office=office,
+        patient=patient,
+        duration_start=start,
+        duration_end=end,
+        booked_at=timezone.now(),
+    )
+
+    return render(request, 'doctors/reserve_time.html')
+
 
 
 @login_required
