@@ -6,18 +6,7 @@ from .models import Wallet
 from doctors.models import Doctor,Office,Visittime  # مطمئن شو اسم مدل درست است
 
 
-@login_required
-def pay(request,doctor_id) :
-    doc = get_object_or_404(Doctor,id=doctor_id)
-    price = doc.offices.first().price
-    wallet = get_object_or_404(Wallet, user=request.user)
-    if wallet.inventory >= price:
-            # کم کردن موجودی
-        Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
-        messages.success(request, "✅ هزینه ویزیت پرداخت شد.")
-    else:
-        messages.error(request, "❌ موجودی کافی نیست!")
-    return render('doctor_detail', doctor_id)
+
 
 
 

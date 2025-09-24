@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect 
 from doctors.models import Doctor,Office,Timesheet,Visittime
-from django.db.models import Q
+from django.db.models import Q , F
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
@@ -11,6 +11,7 @@ from django.utils.dateparse import parse_datetime
 from django.http import HttpResponseBadRequest
 from django.db.models import OuterRef, Exists
 from django.contrib import messages
+from wallet.models import Wallet
 
 
 def doctor_list(request):
@@ -176,6 +177,14 @@ def reserve_visit_time(request,doctor_id):
         duration_end=end,
         booked_at=timezone.now(),
     )
+    price = office.price
+    wallet = get_object_or_404(Wallet, user=request.user)
+    if wallet.inventory >= price:
+            # کم کردن موجودی
+        Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
+        
+    else:
+        redirect('home')
 
     return render(request, 'doctors/reserve_time.html')
 
