@@ -10,12 +10,13 @@ def get_available_timesheets_for_doctor(doctor_id):
     )
 
     visittimes = Visittime.objects.filter(
-        doctor_id=doctor_id,
-        office=OuterRef('office'),
-        canceled_at__isnull=True,
-        duration_start__lt=OuterRef('end'),
-        duration_end__gt=OuterRef('start'),
-    )
+    doctor_id=doctor_id,
+    office=OuterRef('office'),
+    booked_at__isnull=True,  
+    canceled_at__isnull=True,  
+    duration_start__lt=OuterRef('end'),
+    duration_end__gt=OuterRef('start'),
+)
 
     timesheets = timesheets.annotate(
         is_reserved=Exists(visittimes)
@@ -36,11 +37,12 @@ def available_time_slots(timesheet):
         slot_end = current + duration
 
         reserved = Visittime.objects.filter(
-            office=timesheet.office,
-            doctor=timesheet.office.doctor,
-            canceled_at__isnull=True,
-            duration_start__lt=slot_end,
-            duration_end__gt=slot_start,
+        office=timesheet.office,
+        doctor=timesheet.office.doctor,
+        booked_at__isnull=False,  
+        canceled_at__isnull=True,
+        duration_start__lt=slot_end,
+        duration_end__gt=slot_start,
         ).exists()
 
         if not reserved:
