@@ -3,38 +3,91 @@
 {% block content %}
 <h1>لیست دفاتر و تایم‌شیت‌ها</h1>
 
-{% for office in offices %}
-    <div class="office-card">
-        <h2>دفتر دکتر {{ office.doctor }}</h2>
-        <p>مکان: {{ office.location }}</p>
-        <p>شماره تماس: {{ office.phone_num }}</p>
-        <p>قیمت ویزیت: {{ office.price }}</p>
+{% if offices %}
 
-        {% if user.is_authenticated %}
-            {% if user.is_superuser or office.doctor.user == user %}
-                <a href="{% url 'office_edit' office.id %}" class="btn btn-primary mb-2">ویرایش دفتر</a>
+    <label for="search-input">جستجو:</label>
+    <input type="text" id="search-input" class="form-control mb-3" placeholder="جستجو بر اساس دکتر یا مکان...">
+
+    <label for="doctor-select">انتخاب دکتر:</label>
+    <select id="doctor-select" class="form-control mb-3">
+        <option value="">-- دکتر را انتخاب کنید --</option>
+        {% for office in offices %}
+            <option value="{{ office.id }}">{{ office.doctor }}</option>
+        {% endfor %}
+    </select>
+
+    {% for office in offices %}
+        <div class="office-card" id="office-{{ office.id }}">
+            <h2>دفتر دکتر {{ office.doctor }}</h2>
+            <p>مکان: {{ office.location }}</p>
+            <p>شماره تماس: {{ office.phone_num }}</p>
+            <p>قیمت ویزیت: {{ office.price }}</p>
+
+            {% if user.is_authenticated %}
+                {% if user.is_superuser or office.doctor.user == user %}
+                    <a href="{% url 'office_edit' office.id %}" class="btn btn-primary mb-2">ویرایش دفتر</a>
+                {% endif %}
             {% endif %}
-        {% endif %}
 
-        <h3>تایم‌شیت‌ها</h3>
-        <ul>
-            {% for ts in office.time_sheets.all %}
-                <li>
-                    شروع: {{ ts.start }} - پایان: {{ ts.end }} (مدت: {{ ts.duration }} دقیقه)
-                    {% if user.is_authenticated %}
-                        {% if user.is_superuser or office.doctor.user == user %}
-                            | <a href="{% url 'timesheet_edit' ts.id %}" class="btn btn-sm btn-secondary">ویرایش تایم‌شیت</a>
+            <h3>تایم‌شیت‌ها</h3>
+            <ul>
+                {% for ts in office.time_sheets.all %}
+                    <li>
+                        شروع: {{ ts.start }} - پایان: {{ ts.end }} (مدت: {{ ts.duration }} دقیقه)
+                        {% if user.is_authenticated %}
+                            {% if user.is_superuser or office.doctor.user == user %}
+                                | <a href="{% url 'timesheet_edit' ts.id %}" class="btn btn-sm btn-secondary">ویرایش تایم‌شیت</a>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                </li>
-            {% empty %}
-                <li>تایم‌شیتی برای این دفتر ثبت نشده است.</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <hr>
-{% empty %}
+                    </li>
+                {% empty %}
+                    <li>تایم‌شیتی برای این دفتر ثبت نشده است.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+{% else %}
     <p>هیچ دفتری ثبت نشده است.</p>
-{% endfor %}
+{% endif %}
+
+<script>
+const select = document.getElementById('doctor-select');
+const searchInput = document.getElementById('search-input');
+const offices = document.querySelectorAll('.office-card');
+
+offices.forEach(card => card.style.display = 'block');
+
+select.addEventListener('change', function() {
+    const selectedId = this.value;
+    offices.forEach(card => {
+        if (!selectedId) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = card.id === 'office-' + selectedId ? 'block' : 'none';
+        }
+    });
+});
+
+searchInput.addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+
+    offices.forEach(card => {
+        const doctorName = card.querySelector('h2').textContent.toLowerCase();
+        const location = card.querySelector('p').textContent.toLowerCase();
+        if (doctorName.includes(filter) || location.includes(filter)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const selectedId = select.value;
+    if (selectedId) {
+        offices.forEach(card => {
+            card.style.display = card.id === 'office-' + selectedId ? 'block' : 'none';
+        });
+    }
+});
+</script>
 
 {% endblock %}

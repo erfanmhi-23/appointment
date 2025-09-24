@@ -91,7 +91,7 @@ def office_edit(request, office_id):
 
 @staff_member_required
 def timesheet_list(request):
-    offices = Office.objects.select_related('doctor__user').all()
+    offices = Office.objects.select_related('doctor__user').all().order_by('doctor__user__first_name', 'doctor__user__last_name')
     return render(request, 'doctors/timesheet_list.html', {'offices': offices})
 
 
@@ -165,3 +165,23 @@ def add_doctor(request):
 @login_required
 def book_visit(request,doctor_id) :
     doctor = get_object_or_404 (Doctor , id=doctor_id)
+
+def near_doctor(request):
+    field = request.GET.get("field", "")
+    location = request.GET.get("location", "")
+    doctors = Doctor.objects.all()
+
+    if field:
+        doctors = doctors.filter(field__icontains=field)
+    if location:
+        doctors = doctors.filter(offices__location__icontains=location).distinct()
+
+    paginator = Paginator(doctors, 10)
+    page_num = request.GET.get("page")
+    page_obj = paginator.get_page(page_num)
+
+    return render(request, "doctors/near_doctor.html", {
+        "page_obj": page_obj,
+        "field": field,
+        "location": location
+    })
