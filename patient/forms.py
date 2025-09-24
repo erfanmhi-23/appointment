@@ -6,16 +6,21 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 class PatientForm(forms.ModelForm) :
-    username = forms.CharField(max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=150)
-    email = forms.EmailField(required=False)    
+    username = forms.CharField(max_length=150 , label="نام کاربری")
+    password = forms.CharField(widget=forms.PasswordInput, label="رمز")
+    first_name = forms.CharField(max_length=30, label="نام")
+    last_name = forms.CharField(max_length=150, label="نام خانوادگی")
+    email = forms.EmailField(required=False, label="ایمیل")  
 
     class Meta :
         model = Patient
         fields = ['na_id','birth_date']
         widgets = {'birth_date' :forms.DateInput(attrs={"type" : "date"}), }
+        labels = {
+            'na_id' : 'کد ملی' ,
+            'birth_date' : 'تاریخ تولد' ,
+
+        }
 
     def clean_username(self):
         username = self.cleaned_data['username']
