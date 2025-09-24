@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.shortcuts import render, get_object_or_404, redirect 
 from doctors.models import Doctor,Office,Timesheet,Visittime
 from django.db.models import Q , F
 from django.contrib.admin.views.decorators import staff_member_required
@@ -13,6 +12,12 @@ from django.http import HttpResponseBadRequest
 from django.db.models import OuterRef, Exists
 from django.contrib import messages
 from wallet.models import Wallet
+from django.http import HttpResponseBadRequest , HttpResponseRedirect
+from django.contrib.auth import login , get_user_model
+
+User = get_user_model()
+
+
 
 
 def doctor_list(request):
