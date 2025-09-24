@@ -2,11 +2,10 @@
 {% block title %}حذف حساب{% endblock %}
 {% block content %}
 <h1>حذف حساب</h1>
-<p>برای حذف حساب، رمز عبور را وارد کن.</p>
 <form method="post">
   {% csrf_token %}
-  {{ form.non_field_errors }}
   {{ form.as_p }}
-  <button type="submit" style="background:#c00;color:#fff">حذف</button>
+  <button type="submit" style="color:white;background:#d33">حذف دائم</button>
 </form>
+<p style="margin-top:1rem"><a href="{% url 'user:profile' %}">انصراف</a></p>
 {% endblock %}
