@@ -6,27 +6,26 @@
 {% block content %}
 <div style="max-width:1200px; margin:20px auto; display:flex; gap:20px; direction:rtl;">
 
-    
     <div style="flex: 1; background:#f9f9f9; padding:20px; border-radius:8px; height:fit-content;">
       {% for office in doctor.offices.all %}
-    <h4>دفتر: {{ office.location }}</h4>
-    {% for timesheet in office.time_sheets.all %}
-        <div style="background:white; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
-            <p>نزدیکترین نوبت</p>
-            <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
-            <p>ساعت : {{ timesheet.start|time:"H:i" }}</p>
-            <a href="{% url 'reserve_visit_time' doctor.id %}" style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">رزرو نوبت</a>
-            <a href="{% url 'show_timesheet' doctor.id %} " style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">نوبت های بیشتر </a>
-        </div>
+        <h4>دفتر: {{ office.location }}</h4>
+        {% for timesheet in office.time_sheets.all %}
+            <div style="background:white; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+                <p>مبلغ ویزیت :{{office.price}}</p>
+                <p>نزدیکترین نوبت</p>
+                <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
+                <p>ساعت : {{ timesheet.start|time:"H:i" }}</p>
+                <a href="{% url 'reserve_visit_time' doctor.id %}" style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">رزرو نوبت</a>
+                <a href="{% url 'show_timesheet' doctor.id %}" style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">نوبت های بیشتر</a>
+            </div>
         {% empty %}
             <p>تایم‌شیتی برای این دفتر ثبت نشده است.</p>
         {% endfor %}
-    {% empty %}
+      {% empty %}
         <p>دفتر ثبت نشده است.</p>
-    {% endfor %}
+      {% endfor %}
     </div>
 
-    
     <div style="flex: 2; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); text-align:center;">
         {% if doctor.image %}
             <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" style="width:100%; height:300px; object-fit:cover; border-radius:8px;">
@@ -52,32 +51,39 @@
         <hr style="margin:20px 0;">
 
         <h3>ثبت نظر</h3>
-        <form method="post" action="{% url 'add_comment' doctor.id %}" style="text-align:right;">
-            {% csrf_token %}
-            <textarea name="comment_text" rows="4" style="width:100%; padding:10px; border-radius:4px; border:1px solid #ccc;" placeholder="نظر خود را وارد کنید..."></textarea>
 
-            <label for="rating">امتیاز:</label>
-            <select name="rating" id="rating" required>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" selected>3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
+        {% if not user.is_authenticated %}
+            <p style="font-size:16px; color:#333; margin-bottom:10px;">
+                ابتدا <a href="{% url 'login' %}" style="color:#007bff; text-decoration:none;">وارد شوید</a> تا بتوانید نظر خود را ثبت کنید.
+            </p>
+        {% else %}
+            <form method="post" action="{% url 'add_comment' doctor.id %}" style="text-align:right;">
+                {% csrf_token %}
+                <textarea name="comment_text" rows="4" style="width:100%; padding:10px; border-radius:4px; border:1px solid #ccc;" placeholder="نظر خود را وارد کنید..."></textarea>
 
-            <button type="submit" style="margin-top:10px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:4px;">ارسال نظر</button>
-        </form>
+                <label for="rating">امتیاز:</label>
+                <select name="rating" id="rating" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <button type="submit" style="margin-top:10px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:4px;">ارسال نظر</button>
+            </form>
+        {% endif %}
 
         <a href="{% url 'doctor_list' %}" style="display:inline-block; margin-top:20px; padding:10px 20px; background:#007bff; color:white; border-radius:4px; text-decoration:none;">بازگشت به لیست</a>
     </div>
 
-    
     <div style="flex: 1; background:#f1f1f1; padding:20px; border-radius:8px; height:fit-content;">
         <h4>نظرات کاربران</h4>
-        {% for comment in doctor.comments.all %}
-            <div style="background:white; margin-bottom:10px; padding:10px; border-radius:5px; border:1px solid #ddd;">
-                <p><strong>{{ comment.user.username }}</strong> - امتیاز: {{ comment.rating }}/5</p>
-                <p>{{ comment.text }}</p>
+        {% for review in doctor.reviews.all %}
+            <div style="background:white; margin-bottom:10px; padding:10px; border-radius:5px; border:1px solid #ddd; text-align:right;">
+                <p><strong>{{ review.patient.user.get_full_name }}</strong> - امتیاز: {{ review.rating }}/5</p>
+                <p>تاریخ: {{ review.added_time|date:"Y-m-d H:i" }}</p>
+                <p>{{ review.comment }}</p>
             </div>
         {% empty %}
             <p>نظری ثبت نشده است.</p>

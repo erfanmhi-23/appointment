@@ -234,3 +234,7 @@ def google_callback(request):
         user = User.objects.create_user(username=email.split("@")[0], email=email)
     login(request, user)
     return HttpResponseRedirect("/")
+
+def doctor_detail(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    return render(request, 'doctors/doctor_detail.html', {'doctor': doctor})

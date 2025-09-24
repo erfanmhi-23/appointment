@@ -6,25 +6,25 @@ from doctors.models import Doctor, Visittime
 from patient.models import Patient
 from review.models import Review
 
+
+
 @login_required
 def add_comment(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    patient = get_object_or_404(Patient, user=request.user)
+
     if request.method == 'POST':
-        doctor = get_object_or_404(Doctor, id=doctor_id)
-        patient = get_object_or_404(Patient, user=request.user)
         comment_text = request.POST.get("comment_text")
         rating = request.POST.get("rating")
         visit_time_id = request.POST.get("visit_time_id")
-
-        
         if not visit_time_id:
-            messages.error(request,"برای نظر دهی اول باید نوبت بگیرید")
+            messages.error(request, "برای نظر دادن باید ابتدا نوبت انتخاب کنید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
         visit_time = get_object_or_404(Visittime, id=visit_time_id)
 
-        
         if Review.objects.filter(visit_time=visit_time).exists():
-            messages.error(request,"برای این نوبت قبلا نظر داده اید")
+            messages.error(request, "برای این نوبت قبلا نظر داده‌اید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
         if comment_text and rating:
@@ -35,7 +35,6 @@ def add_comment(request, doctor_id):
                 rating=int(rating),
                 visit_time=visit_time
             )
-
-        return redirect('doctor_detail', doctor_id=doctor_id)
+            messages.success(request, "نظر شما با موفقیت ثبت شد.")
 
     return redirect('doctor_detail', doctor_id=doctor_id)
