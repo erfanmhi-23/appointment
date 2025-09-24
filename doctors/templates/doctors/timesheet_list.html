@@ -90,4 +90,13 @@ searchInput.addEventListener('input', function() {
 });
 </script>
 
+            <li>
+                <a href="{% url 'office_detail' office.id %}">
+                    {{ office.doctor }} - {{ office.location }}
+                </a>
+            </li>
+        {% empty %}
+            <li>دفتر ثبت نشده است.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
