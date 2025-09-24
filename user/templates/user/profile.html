@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block title %}پروفایل{% endblock %}
 {% block content %}
-<h1>ویرایش پروفایل</h1>
+<h1>پروفایل</h1>
 <form method="post">
   {% csrf_token %}
-  {{ form.non_field_errors }}
   {{ form.as_p }}
   <button type="submit">ذخیره</button>
 </form>
-<p><a href="{% url 'user:delete_account' %}" style="color:#c00">حذف حساب</a></p>
+
+<p style="margin-top:1rem">
+  <a href="{% url 'user:change_password' %}">تغییر رمز</a> |
+  <a href="{% url 'user:delete_account' %}">حذف حساب</a> |
+  <a href="{% url 'user:logout' %}">خروج</a>
+</p>
 {% endblock %}
