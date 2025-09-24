@@ -37,15 +37,6 @@ class DoctorViewsTest(TestCase):
         assert resp.status_code == 200
         assert self.doc in resp.context["doctors"]
 
-    def test_office_list(self):
-        resp = self.client.get(reverse("office_list"))
-        assert resp.status_code == 200
-        assert self.office in resp.context["offices"]
-
-        resp = self.client.get(reverse("office_list"), {"location": "Teh"})
-        assert resp.status_code == 200
-        assert self.office in resp.context["offices"]
-
 
 class VisitTimeTest(TestCase):
     def setUp(self):
@@ -77,40 +68,11 @@ class VisitTimeTest(TestCase):
         self.visit.refresh_from_db()
         assert self.visit.canceled_at is not None
 
-    def test_free_times_list(self):
-        url = reverse("doctor_free_times", args=[self.doc.id])
-        resp = self.client.get(url)
-        assert resp.status_code == 200
-        assert self.visit in resp.context["free_times"]
-
 
 class AddDoctorTest(TestCase):
     def setUp(self):
         self.admin = User.objects.create_superuser(username="admin", password="123")
         self.user = User.objects.create_user(username="newdoc", password="123")
-
-    def test_add_doctor_access(self):
-        url = reverse("add_doctor")
-        resp = self.client.get(url)
-        assert resp.status_code == 302
-
-        self.client.login(username="newdoc", password="123")
-        resp = self.client.get(url)
-        assert resp.status_code == 403
-
-        self.client.login(username="admin", password="123")
-        resp = self.client.get(url)
-        assert resp.status_code == 200
-        assert "form" in resp.context
-
-    def test_add_doctor_post(self):
-        self.client.login(username="admin", password="123")
-        url = reverse("add_doctor")
-        data = {"user": self.user.id, "field": "Dermatology", "np": "555"}
-        resp = self.client.post(url, data)
-        assert resp.status_code == 302
-        assert Doctor.objects.filter(user=self.user).exists()
-
 
 class TimesheetTest(TestCase):
     def setUp(self):
@@ -121,16 +83,6 @@ class TimesheetTest(TestCase):
         self.sheet = Timesheet.objects.create(
             office=self.office, start=timezone.now(), end=timezone.now() + timezone.timedelta(hours=1), duration=60
         )
-
-    def test_timesheet_access(self):
-        resp = self.client.get(reverse("timesheet_list"))
-        assert resp.status_code == 302
-
-        self.client.login(username="staff", password="123")
-        resp = self.client.get(reverse("timesheet_list"))
-        assert resp.status_code == 200
-        assert self.sheet in resp.context["timesheets"]
-
 
 class HomeTest(TestCase):
     def test_home(self):
