@@ -277,7 +277,6 @@ def doctor_detail(request, doctor_id):
 
 @login_required
 def reserve_visit(request, visit_id):
-    # گرفتن نوبت موردنظر که هنوز رزرو نشده
     visit = get_object_or_404(
         Visittime,
         id=visit_id,
@@ -285,20 +284,16 @@ def reserve_visit(request, visit_id):
         canceled_at__isnull=True
     )
 
-    # گرفتن یا ساخت کیف پول کاربر
     wallet, _ = Wallet.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         price = visit.office.price
         if wallet.inventory >= price:
-            # کم کردن موجودی
             Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
-            # رزرو نوبت
             visit.patient = request.user
             visit.booked_at = timezone.now()
             visit.save()
 
-            # ارسال ایمیل
             send_mail(
                 subject="مشخصات نوبت رزرو شده شما",
                 message=f"سلام {request.user.get_full_name()},\n\nنوبت شما رزرو شد.\nتاریخ: {visit.duration_start.strftime('%Y-%m-%d')}\nساعت: {visit.duration_start.strftime('%H:%M')}\nدفتر: {visit.office.location}",
