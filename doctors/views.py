@@ -239,7 +239,10 @@ def add_doctor(request):
         form = DoctorCreateForm(request.POST, request.FILES)
         if form.is_valid():
             doctor = form.save()
-            return redirect('add_office',doctor_id=doctor.id)
+            if doctor.is_active:
+                return redirect('add_office',doctor_id=doctor.id)
+            else:
+                return redirect('doctor_list')
     else:
         form = DoctorCreateForm()
     return render(request, 'doctors/add_doctor.html', {'form': form})
