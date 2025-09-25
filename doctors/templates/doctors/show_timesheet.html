@@ -7,9 +7,12 @@
   <div style="display:flex; flex-wrap:wrap; gap:10px;">
     {% for slot in slots %}
       <div style="border:1px solid #ccc; padding:8px; border-radius:4px; min-width:110px; text-align:center;">
-        {{ slot.start|time:"H:i" }} - {{ slot.end|time:"H:i" }}<br>
+        {{ slot.start|time:"H:i" }} - {{ slot.end|time:"H:i" }}
         {% if user.is_authenticated %}
-        <a href="{% url 'reserve_visit_time' doctor_id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">رزرو نوبت</a>
+        <br>
+        <a href="{% url 'reserve_visit_time' doctor.id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">
+            رزرو نوبت
+        </a>
         {% endif %}
       </div>
     {% endfor %}
@@ -17,6 +20,7 @@
 {% empty %}
   <p>زمان آزاد موجود نیست.</p>
 {% endfor %}
+
 
 
 {% endblock %}

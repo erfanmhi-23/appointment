@@ -20,6 +20,5 @@ urlpatterns = [
     path('showtimesheet/<int:doctor_id>/' , views.available_times_for_doctor, name='show_timesheet'),
     path("near-doctor/", views.near_doctor, name="near_doctor"),
     path('doctor/<int:doctor_id>/', views.doctor_detail, name='doctor_detail'),
-    
-
+    path('visit/<int:visit_id>/reserve/', views.reserve_visit, name='reserve_visit'),
 ]

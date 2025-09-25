@@ -10,10 +10,11 @@ from doctors.services import get_available_timeslots_for_doctor
 from django.utils.dateparse import parse_datetime
 from django.http import HttpResponseBadRequest
 from django.db.models import OuterRef, Exists
-from django.contrib import messages
 from wallet.models import Wallet
 from django.http import HttpResponseBadRequest , HttpResponseRedirect
 from django.contrib.auth import login , get_user_model
+from django.contrib import messages
+from django.core.mail import send_mail
 
 User = get_user_model()
 
@@ -120,12 +121,13 @@ def timesheet_list(request):
 
 def available_times_for_doctor(request, doctor_id):
     timesheet_slots = get_available_timeslots_for_doctor(doctor_id)
+    doctor = get_object_or_404(Doctor, id=doctor_id)
 
     return render(request, 'doctors/show_timesheet.html', {
+        'doctor': doctor,
         'doctor_id': doctor_id,
         'timesheet_slots': timesheet_slots,
     })
-
 
 
 @staff_member_required
@@ -185,7 +187,6 @@ def reserve_visit_time(request,doctor_id):
     price = office.price
     wallet = get_object_or_404(Wallet, user=request.user)
     if wallet.inventory >= price:
-            # کم کردن موجودی
         Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
         
     else:
@@ -273,3 +274,42 @@ def doctor_detail(request, doctor_id):
         'doctor': doctor,
         'doctor_times': doctor_times
     })
+
+@login_required
+def reserve_visit(request, visit_id):
+    # گرفتن نوبت موردنظر که هنوز رزرو نشده
+    visit = get_object_or_404(
+        Visittime,
+        id=visit_id,
+        patient__isnull=True,
+        canceled_at__isnull=True
+    )
+
+    # گرفتن یا ساخت کیف پول کاربر
+    wallet, _ = Wallet.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        price = visit.office.price
+        if wallet.inventory >= price:
+            # کم کردن موجودی
+            Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
+            # رزرو نوبت
+            visit.patient = request.user
+            visit.booked_at = timezone.now()
+            visit.save()
+
+            # ارسال ایمیل
+            send_mail(
+                subject="مشخصات نوبت رزرو شده شما",
+                message=f"سلام {request.user.get_full_name()},\n\nنوبت شما رزرو شد.\nتاریخ: {visit.duration_start.strftime('%Y-%m-%d')}\nساعت: {visit.duration_start.strftime('%H:%M')}\nدفتر: {visit.office.location}",
+                from_email="noreply@example.com",
+                recipient_list=[request.user.email],
+                fail_silently=True
+            )
+
+            messages.success(request, "✅ نوبت رزرو شد و ایمیل ارسال شد.")
+            return redirect('doctor_detail', doctor_id=visit.doctor.id)
+        else:
+            messages.error(request, "❌ موجودی کافی نیست. لطفاً کیف پول خود را شارژ کنید.")
+
+    return render(request, "doctors/reserve_time.html", {"visit": visit, "wallet": wallet})
