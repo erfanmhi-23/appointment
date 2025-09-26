@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -8,23 +8,27 @@ from review.models import Review
 
 @login_required
 def add_comment(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+
+    try:
+        patient = request.user.patient_profile
+    except Patient.DoesNotExist:
+        messages.error(request, "برای ثبت نظر باید به عنوان بیمار ثبت‌نام کرده باشید.")
+        return redirect('doctor_detail', doctor_id=doctor_id)
+
     if request.method == 'POST':
-        doctor = get_object_or_404(Doctor, id=doctor_id)
-        patient = get_object_or_404(Patient, user=request.user)
         comment_text = request.POST.get("comment_text")
         rating = request.POST.get("rating")
         visit_time_id = request.POST.get("visit_time_id")
 
-        
         if not visit_time_id:
-            messages.error(request,"برای نظر دهی اول باید نوبت بگیرید")
+            messages.error(request, "برای نظر دادن باید ابتدا یک نوبت انتخاب کنید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
-        visit_time = get_object_or_404(Visittime, id=visit_time_id)
+        visit_time = get_object_or_404(Visittime, id=visit_time_id, patient=request.user)
 
-        
         if Review.objects.filter(visit_time=visit_time).exists():
-            messages.error(request,"برای این نوبت قبلا نظر داده اید")
+            messages.error(request, "برای این نوبت قبلاً نظر داده‌اید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
         if comment_text and rating:
@@ -35,7 +39,6 @@ def add_comment(request, doctor_id):
                 rating=int(rating),
                 visit_time=visit_time
             )
-
-        return redirect('doctor_detail', doctor_id=doctor_id)
+            messages.success(request, "نظر شما با موفقیت ثبت شد.")
 
     return redirect('doctor_detail', doctor_id=doctor_id)

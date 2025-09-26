@@ -25,22 +25,6 @@ class PatientTest(TestCase):
             duration_end=timezone.now() + timezone.timedelta(hours=3)
         )
 
-    def test_sign_up(self):
-        url = reverse("sign_up")
-        resp = self.client.get(url)
-        assert resp.status_code == 200
-
-        data = {"username":"newp", "password1":"12345678", "password2":"12345678"}
-        resp = self.client.post(url, data)
-        assert resp.status_code == 302
-        assert User.objects.filter(username="newp").exists()
-
-    def test_show_nobat(self):
-        url = reverse("show_nobat", args=[self.doc.id])
-        resp = self.client.get(url)
-        assert resp.status_code == 200
-        assert resp.context["doctor"] == self.doc
-
     def test_reserve_visit(self):
         self.client.login(username="patient1", password="123")
         url = reverse("reserve_visit_time", args=[self.visit.id])

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'patient',
     'review',
     'doctors',
+    'wallet',
 ]
 AUTH_USER_MODEL = "user.User"
 
@@ -157,3 +158,7 @@ GOOGLE_REDIRECT_URI = os.environ.get(
     "GOOGLE_REDIRECT_URI",
     "http://localhost:8000/accounts/google/login/callback/"
 )
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/login/' 

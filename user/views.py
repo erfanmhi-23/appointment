@@ -5,6 +5,10 @@ from django.contrib.auth import get_user_model, login
 from .forms import EmailForm
 from .models import EmailOTP
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import F
+from django.contrib import messages
+from wallet.models import Wallet
 
 ###email otp 
 User = get_user_model()
@@ -57,3 +61,40 @@ def google_callback(request):
         return HttpResponse("کد OAuth گوگل پیدا نشد!")
 
     return HttpResponse(f"ورود با گوگل موفق! کد برگشتی گوگل: {code}")
+
+
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    wallet = None
+
+    
+    try:
+        wallet = user.wallet
+    except Wallet.DoesNotExist:
+        wallet = None
+
+    if request.method == 'POST':
+        
+        amount = request.POST.get('amount')
+        try:
+            amount = int(amount)
+            if amount > 0:
+                if wallet:
+                    wallet.inventory = F('inventory') + amount
+                    wallet.save()
+                    messages.success(request, f'موجودی شما به اندازه {amount} تومان افزایش یافت.')
+                else:
+                    messages.error(request, 'کیف پول شما موجود نیست.')
+            else:
+                messages.error(request, 'مقدار باید عدد مثبت باشد.')
+        except ValueError:
+            messages.error(request, 'لطفا مقدار صحیح وارد کنید.')
+        return redirect('profile')
+
+    return render(request, 'user/profile.html', {
+        'user': user,
+        'wallet': wallet,
+    })

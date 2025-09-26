@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}پروفایل کاربری{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; padding: 20px; background: #f9f9f9; border-radius: 8px; text-align: right;">
+    <h2>پروفایل شما</h2>
+
+    <p><strong>نام کامل:</strong> {{ user.get_full_name|default:user.username }}</p>
+    <p><strong>ایمیل:</strong> {{ user.email }}</p>
+
+    {% if wallet %}
+        <p><strong>موجودی کیف پول:</strong> {{ wallet.inventory }} تومان</p>
+        <p><strong>شماره کارت : {{wallet.cart_num}}</strong></p>
+    {% else %}
+
+        <a href="{% url 'create_wallet' %}">ایجاد کیف پول</a>
+
+    {% endif %}
+
+    <hr>
+
+    <h3>افزایش موجودی کیف پول</h3>
+    <form method="post" action="{% url 'profile' %}">
+        {% csrf_token %}
+        <label for="amount">مقدار (تومان):</label><br>
+        <input type="number" id="amount" name="amount" min="1" required style="padding: 8px; width: 100%; margin-bottom: 10px;"><br>
+        <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            افزایش موجودی
+        </button>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'success' in message.tags %}
+                <p style="margin-top:10px; color:green;">{{ message }}</p>
+            {% else %}
+                <p style="margin-top:10px; color:red;">{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

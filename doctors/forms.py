@@ -6,15 +6,22 @@ from .models import Doctor , Office , Timesheet
 User = get_user_model()
 
 class DoctorCreateForm(forms.ModelForm):
-    username = forms.CharField(max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=150)
-    email = forms.EmailField(required=False)
+    username = forms.CharField(max_length=150 , label="نام کاربری")
+    password = forms.CharField(widget=forms.PasswordInput, label="رمز")
+    first_name = forms.CharField(max_length=30, label="نام")
+    last_name = forms.CharField(max_length=150, label="نام خانوادگی")
+    email = forms.EmailField(required=False, label="ایمیل")
 
     class Meta:
         model = Doctor
-        fields = ['field', 'expertise', 'np', 'image']
+        fields = ['field', 'expertise', 'np', 'image','is_active']
+        labels = {
+            'field': 'رشته',
+            'expertise': 'تخصص',
+            'np': 'شماره نظام پزشکی',
+            'image': 'عکس',
+            'is_active' : 'فعال',
+        }
 
     def save(self, commit=True):
         user_data = {
@@ -39,6 +46,11 @@ class OfficeForm(forms.ModelForm):
     class Meta:
         model = Office
         fields = ['location', 'phone_num', 'price']
+        labels = {
+            'location':'مکان',
+            'phone_num': 'شماره تلفن',
+            'price':'قیمت'
+        }
 
 class TimesheetForm(forms.ModelForm):
     class Meta:
