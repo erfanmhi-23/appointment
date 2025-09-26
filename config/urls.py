@@ -32,8 +32,6 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('', include('wallet.urls')), 
     path("accounts/google/login/callback/", views.google_callback, name="google_callback"),
-
-
 ]
 
 

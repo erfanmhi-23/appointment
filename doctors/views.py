@@ -44,10 +44,8 @@ def doctor_detail(request, doctor_id):
         id=doctor_id
     )
 
-    # گرفتن همه تایم‌شیت‌های همه دفاتر دکتر
     timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
 
-    # نمونه‌ استفاده از doctor_times همانطور که قبلاً بود
     doctor_times = None
     if request.user.is_authenticated:
         try:
@@ -161,10 +159,7 @@ def timesheet_edit(request, timesheet_id):
 
 def available_times_for_timesheet(request, timesheet_id):
     timesheet = get_object_or_404(Timesheet, id=timesheet_id)
-    
-    # گرفتن اسلات‌های آزاد برای این تایم‌شیت
     timesheet_slots = get_available_time_slots_for_timesheet(timesheet_id)
-
     return render(request, 'doctors/show_timesheet.html', {
         'timesheet': timesheet,
         'timesheet_slots': timesheet_slots,
@@ -246,10 +241,6 @@ def reserve_visit_time(request, doctor_id):
         return redirect('home')
 
    
-
-
-
-
 @login_required
 def cancel_visit_time(request, visit_id):
     visit_time = get_object_or_404(Visittime, id=visit_id, patient=request.user, canceled_at__isnull=True)
