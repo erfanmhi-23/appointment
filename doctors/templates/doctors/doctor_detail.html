@@ -9,15 +9,12 @@
 
     <div style="flex: 1; background:#f9f9f9; padding:20px; border-radius:8px; height:fit-content;">
     {% for office in doctor.offices.all %}
-    <h4>دفتر: {{ office.location }}</h4>
-    {% for timesheet in office.time_sheets.all %}
-        <div style="background:white; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
-            <p>مبلغ ویزیت : {{ office.price }}</p>
-            <!--<p>نزدیکترین نوبت</p>
+        <h4>دفتر: {{ office.location }}</h4>
+        <p>مبلغ ویزیت : {{ office.price }}</p>
+    {% for timesheet in timesheets %}
+        <div style="background:white; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;"> 
             <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
-            <p>ساعت : {{ timesheet.start|time:"H:i" }}</p>
-            !-->
-            <a href="{% url 'show_timesheet' doctor.id %} " style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">نوبت ها </a>
+            <a href="{% url 'show_timesheet' timesheet.id %} " style="display:inline-block; margin-top:5px; padding:5px 10px; background:#28a745; color:white; border-radius:4px; text-decoration:none;">نوبت ها </a>
         </div>
         {% empty %}
             <p>تایم‌شیتی برای این دفتر ثبت نشده است.</p>
