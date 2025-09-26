@@ -10,7 +10,7 @@
         {{ slot.start|time:"H:i" }} - {{ slot.end|time:"H:i" }}
         {% if user.is_authenticated %}
         <br>
-        <a href="{% url 'reserve_visit_time' doctor.id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">
+        <a href="{% url 'reserve_time' doctor_id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">
             رزرو نوبت
         </a>
         {% endif %}

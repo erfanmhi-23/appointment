@@ -5,7 +5,7 @@ from review.views import add_comment
 
 urlpatterns = [
     path('doctors/', views.doctor_list, name='doctor_list'),
-
+    path('doctors/<int:doctor_id>/',views.reserve_time , name='reserve_time'),
     path('doctor-search/', views.doctor_search, name='doctor_search'),
     path('timesheets/', views.timesheet_list, name='timesheet_list'),
     path('office/<int:office_id>/', views.office_detail, name='office_detail'),

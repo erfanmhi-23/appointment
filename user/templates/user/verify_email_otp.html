@@ -8,5 +8,14 @@
     {% csrf_token %}
     <input type="text" name="code" placeholder="کد OTP" required>
     <button type="submit">تأیید</button>
+  {% if messages %}
+        {% for message in messages %}
+            {% if 'success' in message.tags %}
+                <p style="margin-top:10px; color:green;">{{ message }}</p>
+            {% else %}
+                <p style="margin-top:10px; color:red;">{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
   </form>
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}ایجاد کیف پول{% endblock %}
+
+{% block content %}
+<div style="max-width:600px; margin:40px auto; padding:20px; background:#fff; border-radius:8px; text-align:right;">
+    <h2>ایجاد کیف پول</h2>
+    <p>لطفاً شماره کارت ۱۶ رقمی خود را وارد کنید.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div style="margin-bottom:10px;">
+            {{ form.cart_num.label_tag }}
+            {{ form.cart_num }}
+            {% if form.cart_num.errors %}
+                <div style="color:red;">{{ form.cart_num.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" style="padding:10px 18px; background:#007bff; color:#fff; border:none; border-radius:6px;">
+            ساخت کیف پول
+        </button>
+    </form>
+</div>
+{% endblock %}

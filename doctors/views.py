@@ -159,17 +159,42 @@ def available_times_for_doctor(request, doctor_id):
         'timesheet_slots': timesheet_slots,
     })
 
+@login_required
+def reserve_time(request , doctor_id):
+    doctor = Doctor.objects.get(id=doctor_id)
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+
+    start_date = parse_datetime(start) if start else None
+    end_date = parse_datetime(end) if end else None
+
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+    except Wallet.DoesNotExist:
+        wallet = None  
+
+    return render(request, 'doctors/reserve_time.html', {
+        'doctor': doctor,
+        'start': start,
+        'end': end,
+        'wallet': wallet,
+        'start_date':start_date,
+        'end_date': end_date,  
+    })
 
 
 @login_required
-def reserve_visit_time(request,doctor_id):
+def reserve_visit_time(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
     office = doctor.offices.first()
     patient = request.user
 
-    
-    start_str = request.GET.get('start')
-    end_str = request.GET.get('end')
+    if request.method == 'POST':
+        start_str = request.POST.get('start')
+        end_str = request.POST.get('end')
+    else:
+        
+        return HttpResponseBadRequest("درخواست نامعتبر است.")
 
     if not start_str or not end_str:
         return HttpResponseBadRequest("پارامترهای زمان ارسال نشده‌اند.")
@@ -180,8 +205,6 @@ def reserve_visit_time(request,doctor_id):
     if not start or not end:
         return HttpResponseBadRequest("فرمت زمان معتبر نیست.")
         
-
-    
     already_reserved = Visittime.objects.filter(
         doctor=doctor,
         office=office,
@@ -204,11 +227,14 @@ def reserve_visit_time(request,doctor_id):
     wallet = get_object_or_404(Wallet, user=request.user)
     if wallet.inventory >= price:
         Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
-        
+        return redirect('doctor_list')#or some succes resid
+    if wallet.inventory < price :
+        return HttpResponseBadRequest("موجودی کیف پول کافی نمیباشد از قسمت پروفایل نسبت به شارژ آن اقدام نمایید")
     else:
-        redirect('home')
+        return redirect('home')
 
-    return render(request, 'doctors/reserve_time.html')
+   
+
 
 
 

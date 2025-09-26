@@ -7,22 +7,30 @@
 <div style="max-width:600px; margin:50px auto; padding:20px; background:#f9f9f9; border-radius:8px; text-align:right;">
 
     <h2>رزرو نوبت</h2>
-
+    {% for office in doctor.offices.all %}
     <p><strong>دکتر:</strong> {{ doctor.user.get_full_name }}</p>
-    <p><strong>دفتر:</strong> {{ office.location }}</p>
-    <p><strong>تاریخ و ساعت:</strong> {{ visit.duration_start|date:"Y-m-d H:i" }}</p>
-    <p><strong>هزینه:</strong> {{ office.price }}</p>
-
+    <p><strong>مطب:</strong> {{ office.location }}</p>
+    <p><strong>تاریخ :</strong> {{ start_date|date:"Y-m-d" }}</p>
+    <p><strong>ساعت شروع:</strong> {{ start_date|date:"H:i" }}</p>
+    <p><strong>ساعت پایان:</strong> {{ end_date|date:"H:i" }}</p>
+    <p><strong>هزینه ویزیت:</strong> {{ office.price }}</p>
+    {% endfor %}
     <hr>
 
-    <h3>موجودی کیف پول شما: {{ wallet.inventory }}</h3>
 
-    <form method="post">
+    {% if wallet %}
+    <h3>موجودی کیف پول شما: {{ wallet.inventory }} تومان</h3>
+    <form method="post" action="{% url 'reserve_visit_time' doctor.id %}">
         {% csrf_token %}
+        <input type="hidden" name="start" value="{{ start }}">
+        <input type="hidden" name="end" value="{{ end }}">
         <button type="submit" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:4px;">
             رزرو نوبت و کسر موجودی
         </button>
     </form>
+    {% else %}
+        <a href="{% url 'create_wallet' %}">ایجاد کیف پول</a>
+    {% endif %}
 
     {% if messages %}
         {% for message in messages %}

@@ -167,12 +167,16 @@
 
         <div class="login-section" id="loginSection">
             {% if user.is_authenticated %}
-                <span style="margin-right:10px;">{{ user.get_full_name|default:user.username }}</span>
+                <span style="margin-right:10px;">
+                    {{ user.get_full_name|default:user.username }}
+                    <a href="{% url 'profile' %}" style="color: white; margin-right: 10px; text-decoration: underline;">پروفایل</a>
+                </span>
                 <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">خروج</button>
+                {% csrf_token %}
+                <button type="submit">خروج</button>
                 </form>
             {% else %}
+
                 <a href="{% url 'login' %}">
                     <button>ورود</button>
                 </a>
