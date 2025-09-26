@@ -1,31 +1,31 @@
 from datetime import timedelta
-from django.db.models import OuterRef, Exists
-from .models import Doctor, Timesheet, Visittime
+from doctors.models import Timesheet, Visittime
 
-def get_available_timesheets_for_doctor(doctor_id):
-    doctor_offices = Doctor.objects.get(id=doctor_id).offices.all()
-
-    timesheets = Timesheet.objects.filter(
-        office__in=doctor_offices
-    )
+def get_available_timesheet(timesheet_id):
+    try:
+        timesheet = Timesheet.objects.get(id=timesheet_id)
+    except Timesheet.DoesNotExist:
+        return None
 
     visittimes = Visittime.objects.filter(
-    doctor_id=doctor_id,
-    office=OuterRef('office'),
-    booked_at__isnull=True,  
-    canceled_at__isnull=True,  
-    duration_start__lt=OuterRef('end'),
-    duration_end__gt=OuterRef('start'),
-)
+        doctor=timesheet.office.doctor,
+        office=timesheet.office,
+        booked_at__isnull=True,
+        canceled_at__isnull=True,
+        duration_start__lt=timesheet.end,
+        duration_end__gt=timesheet.start,
+    )
 
-    timesheets = timesheets.annotate(
-        is_reserved=Exists(visittimes)
-    ).filter(is_reserved=False)
-
-    return timesheets
+    if visittimes.exists():
+        return None  
+    return timesheet
 
 
-def available_time_slots(timesheet):
+def get_available_time_slots_for_timesheet(timesheet_id):
+    timesheet = get_available_timesheet(timesheet_id)
+    if not timesheet:
+        return []  
+
     slots = []
     start = timesheet.start
     end = timesheet.end
@@ -37,12 +37,12 @@ def available_time_slots(timesheet):
         slot_end = current + duration
 
         reserved = Visittime.objects.filter(
-        office=timesheet.office,
-        doctor=timesheet.office.doctor,
-        booked_at__isnull=False,  
-        canceled_at__isnull=True,
-        duration_start__lt=slot_end,
-        duration_end__gt=slot_start,
+            office=timesheet.office,
+            doctor=timesheet.office.doctor,
+            booked_at__isnull=False,
+            canceled_at__isnull=True,
+            duration_start__lt=slot_end,
+            duration_end__gt=slot_start,
         ).exists()
 
         if not reserved:
@@ -54,13 +54,3 @@ def available_time_slots(timesheet):
         current += duration
 
     return slots
-
-
-def get_available_timeslots_for_doctor(doctor_id):
-    timesheets = get_available_timesheets_for_doctor(doctor_id)
-
-    timesheet_slots = {}
-    for ts in timesheets:
-        timesheet_slots[ts] = available_time_slots(ts)
-
-    return timesheet_slots

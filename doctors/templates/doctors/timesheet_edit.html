@@ -10,7 +10,11 @@
         {{ form.as_p }}
         <button type="submit">ذخیره تغییرات</button>
     </form>
-
+    <p>
+        <a href="{% url 'add_timesheet' timesheet.office.doctor.id timesheet.office.id %}">
+            + افزودن تایم‌شیت جدید
+        </a>
+    </p>
     <a href="{% url 'timesheet_list'  %}">بازگشت به لیست دفاتر</a>
 
 {% endblock %}
