@@ -3,6 +3,5 @@ from . import views
 from .views import add_comment
 
 urlpatterns = [
-    #path('doctor/<int:doctor_id>/add-comment/', views.add_comment, name='add_comment'),
     path('doctor/<int:doctor_id>/add-comment/', add_comment, name='add_comment'),
 ]

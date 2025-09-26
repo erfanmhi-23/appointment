@@ -1,11 +1,10 @@
-from django.shortcuts import render
+
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from doctors.models import Doctor, Visittime
 from patient.models import Patient
 from review.models import Review
-from datetime import date
 
 @login_required
 def add_comment(request, doctor_id):

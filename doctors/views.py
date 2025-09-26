@@ -227,7 +227,8 @@ def reserve_visit_time(request, doctor_id):
     wallet = get_object_or_404(Wallet, user=request.user)
     if wallet.inventory >= price:
         Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
-        return redirect('doctor_list')#or some succes resid
+        send_visit_confirmation_email(patient, doctor, office, start, end, price)
+        return redirect('doctor_list')
     if wallet.inventory < price :
         return HttpResponseBadRequest("موجودی کیف پول کافی نمیباشد از قسمت پروفایل نسبت به شارژ آن اقدام نمایید")
     else:
@@ -303,3 +304,34 @@ def google_callback(request):
         user = User.objects.create_user(username=email.split("@")[0], email=email)
     login(request, user)
     return HttpResponseRedirect("/")
+
+def send_visit_confirmation_email(patient, doctor, office, start, end, price):
+    if not patient.email:
+        return
+
+    subject = 'تایید رزرو نوبت'
+    message = f"""
+سلام {patient.get_full_name()}،
+
+نوبت شما با موفقیت رزرو شد.
+
+جزئیات نوبت:
+دکتر: {doctor.user.get_full_name()}
+مطب: {office.location}
+تاریخ: {start.date()}
+ساعت شروع: {start.time().strftime('%H:%M')}
+ساعت پایان: {end.time().strftime('%H:%M')}
+هزینه ویزیت: {price} تومان
+
+با تشکر،
+تیم کلینیک
+    """
+    from django.core.mail import send_mail
+
+    send_mail(
+        subject,
+        message,
+        'noreply@example.com',
+        [patient.email],
+        fail_silently=False,
+    )

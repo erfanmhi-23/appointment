@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import F
 from .models import Wallet
-from doctors.models import Doctor,Office,Visittime  # مطمئن شو اسم مدل درست است
+from doctors.models import Visittime
 from wallet.forms import WalletCreateForm  
 
 @login_required
@@ -27,30 +27,21 @@ def create_wallet(request):
 
     return render(request, 'create_wallet.html', {'form': form})
 
-
-
-
-
-
-
-
 @login_required
 def wallet_view(request, visit_id=None):
-    # گرفتن کیف پول کاربر
     wallet = get_object_or_404(Wallet, user=request.user)
-    visit = None  # مقدار پیش‌فرض
+    visit = None
 
     if visit_id:
         visit = get_object_or_404(Visittime, id=visit_id, patient=request.user.patient)
         price = visit.doctor.office.price  
 
         if wallet.inventory >= price:
-            # کم کردن موجودی
             Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
             messages.success(request, "✅ هزینه ویزیت پرداخت شد.")
         else:
             messages.error(request, "❌ موجودی کافی نیست!")
 
-        return redirect("wallet_view")  # بعد پرداخت برگرد به کیف پول
+        return redirect("wallet_view")
 
     return render(request, "wallet.html", {"wallet": wallet, "visit": visit})

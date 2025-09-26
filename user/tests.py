@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from user.models import EmailOTP
-from django.utils import timezone
+
 
 User = get_user_model()
 
