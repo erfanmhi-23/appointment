@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
-from doctors.services import get_available_timeslots_for_doctor
+from doctors.services import get_available_time_slots_for_timesheet
 from django.utils.dateparse import parse_datetime
 from django.http import HttpResponseBadRequest
 from wallet.models import Wallet
@@ -39,8 +39,15 @@ def doctor_list(request):
     })
 
 def doctor_detail(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
+    doctor = get_object_or_404(
+        Doctor.objects.prefetch_related('offices__time_sheets'),
+        id=doctor_id
+    )
 
+    # گرفتن همه تایم‌شیت‌های همه دفاتر دکتر
+    timesheets = Timesheet.objects.filter(office__doctor=doctor).order_by('start')
+
+    # نمونه‌ استفاده از doctor_times همانطور که قبلاً بود
     doctor_times = None
     if request.user.is_authenticated:
         try:
@@ -56,6 +63,7 @@ def doctor_detail(request, doctor_id):
     return render(request, 'doctors/doctor_detail.html', {
         'doctor': doctor,
         'doctor_times': doctor_times,
+        'timesheets': timesheets,
     })
 
 
@@ -151,11 +159,14 @@ def timesheet_edit(request, timesheet_id):
     return render(request, 'doctors/timesheet_edit.html', {'form': form, 'timesheet': timesheet})
 
 
-def available_times_for_doctor(request, doctor_id):
-    timesheet_slots = get_available_timeslots_for_doctor(doctor_id)
+def available_times_for_timesheet(request, timesheet_id):
+    timesheet = get_object_or_404(Timesheet, id=timesheet_id)
+    
+    # گرفتن اسلات‌های آزاد برای این تایم‌شیت
+    timesheet_slots = get_available_time_slots_for_timesheet(timesheet_id)
 
     return render(request, 'doctors/show_timesheet.html', {
-        'doctor_id': doctor_id,
+        'timesheet': timesheet,
         'timesheet_slots': timesheet_slots,
     })
 

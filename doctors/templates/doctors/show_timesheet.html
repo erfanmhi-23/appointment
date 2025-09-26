@@ -1,26 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% for timesheet, slots in timesheet_slots.items %}
   <h4>دفتر: {{ timesheet.office.location }}</h4>
   <p>تاریخ: {{ timesheet.start|date:"Y-m-d" }}</p>
   <div style="display:flex; flex-wrap:wrap; gap:10px;">
-    {% for slot in slots %}
+    {% for slot in timesheet_slots %}
       <div style="border:1px solid #ccc; padding:8px; border-radius:4px; min-width:110px; text-align:center;">
         {{ slot.start|time:"H:i" }} - {{ slot.end|time:"H:i" }}
         {% if user.is_authenticated %}
-        <br>
-        <a href="{% url 'reserve_time' doctor_id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">
+          <br>
+          <a href="{% url 'reserve_time' timesheet.office.doctor.id %}?start={{ slot.start|date:'c'|urlencode }}&end={{ slot.end|date:'c'|urlencode }}" style="color:blue; text-decoration:underline;">
             رزرو نوبت
-        </a>
+          </a>
         {% endif %}
       </div>
     {% endfor %}
   </div>
-{% empty %}
-  <p>زمان آزاد موجود نیست.</p>
-{% endfor %}
-
-
-
+  {% if not timesheet_slots %}
+    <p>زمان آزاد موجود نیست.</p>
+  {% endif %}
 {% endblock %}
