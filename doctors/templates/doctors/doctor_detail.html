@@ -65,12 +65,13 @@
                     {% if doctor_times %}
                         {% for timeslot in doctor_times %}
                             <option value="{{ timeslot.id }}">
-                                {{ timeslot.start|date:"Y-m-d H:i" }}
+                                {{ timeslot.duration_start|date:"Y-m-d H:i" }}
                             </option>
                         {% endfor %}
                     {% else %}
                         <option value="">نوبت موجود نیست</option>
                     {% endif %}
+
                 </select>
 
                 <textarea name="comment_text" rows="4" style="width:100%; padding:10px; border-radius:4px; border:1px solid #ccc;" placeholder="نظر خود را وارد کنید..." required></textarea>

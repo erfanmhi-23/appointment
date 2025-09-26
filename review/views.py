@@ -11,14 +11,11 @@ from datetime import date
 def add_comment(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
 
-    # اگر Patient موجود نباشه، خودکار بساز
-    patient, created = Patient.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'name': request.user.get_full_name() or "کاربر",
-            'birth_date': date(2000,1,1)  # مقدار پیش‌فرض
-        }
-    )
+    try:
+        patient = request.user.patient_profile
+    except Patient.DoesNotExist:
+        messages.error(request, "برای ثبت نظر باید به عنوان بیمار ثبت‌نام کرده باشید.")
+        return redirect('doctor_detail', doctor_id=doctor_id)
 
     if request.method == 'POST':
         comment_text = request.POST.get("comment_text")
@@ -29,10 +26,10 @@ def add_comment(request, doctor_id):
             messages.error(request, "برای نظر دادن باید ابتدا یک نوبت انتخاب کنید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
-        visit_time = get_object_or_404(Visittime, id=visit_time_id)
+        visit_time = get_object_or_404(Visittime, id=visit_time_id, patient=request.user)
 
         if Review.objects.filter(visit_time=visit_time).exists():
-            messages.error(request, "برای این نوبت قبلا نظر داده‌اید.")
+            messages.error(request, "برای این نوبت قبلاً نظر داده‌اید.")
             return redirect('doctor_detail', doctor_id=doctor_id)
 
         if comment_text and rating:

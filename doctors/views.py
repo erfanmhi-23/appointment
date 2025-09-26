@@ -9,12 +9,11 @@ from .forms import DoctorCreateForm , OfficeForm , TimesheetForm
 from doctors.services import get_available_timeslots_for_doctor
 from django.utils.dateparse import parse_datetime
 from django.http import HttpResponseBadRequest
-from django.db.models import OuterRef, Exists
 from wallet.models import Wallet
 from django.http import HttpResponseBadRequest , HttpResponseRedirect
 from django.contrib.auth import login , get_user_model
-from django.contrib import messages
-from django.core.mail import send_mail
+from patient.models import Patient
+
 
 User = get_user_model()
 
@@ -39,28 +38,24 @@ def doctor_list(request):
         'location': location,
     })
 
-
 def doctor_detail(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
-    unbooked_visits = Visittime.objects.filter(
-        doctor=doctor,
-        office=OuterRef('office'),
-        booked_at__isnull=True,  
-        canceled_at__isnull=True,
-        duration_start__lt=OuterRef('end'),
-        duration_end__gt=OuterRef('start'),
-    )
-    timesheets = Timesheet.objects.filter(
-        office__doctor=doctor
-    ).annotate(
-        has_unbooked_visit=Exists(unbooked_visits)
-    ).filter(
-        has_unbooked_visit=True
-    ).order_by('start')
+
+    doctor_times = None
+    if request.user.is_authenticated:
+        try:
+            patient = request.user.patient_profile
+            doctor_times = Visittime.objects.filter(
+                doctor=doctor,
+                patient=request.user,
+                canceled_at__isnull=True
+            ).order_by('-duration_start')
+        except Patient.DoesNotExist:
+            doctor_times = None
 
     return render(request, 'doctors/doctor_detail.html', {
         'doctor': doctor,
-        'timesheets': timesheets,
+        'doctor_times': doctor_times,
     })
 
 
@@ -77,20 +72,6 @@ def doctor_search(request):
 
     return render(request, 'doctors/doctor_search.html', {'doctors': doctors, 'query': query})
 
-##del
-def doctor_free_times(request, doctor_id):
-    free_times = Visittime.objects.filter(doctor_id = doctor_id, patient__isnull=True, canceled_at__isnull=True)
-    return render(request, 'doctors/doctor_free_times.html', {'free_times': free_times})
-
-##del
-def office_list(request):
-    location = request.GET.get('location')
-    if location:
-        offices = Office.objects.filter(location__icontains = location)
-    else:
-        offices = Office.objects.all()
-    return render(request, 'doctors/office_list.html',{'offices': offices})
-
 
 @staff_member_required
 def office_detail(request, office_id):
@@ -98,6 +79,22 @@ def office_detail(request, office_id):
     timesheets = office.time_sheets.all().order_by('start')
     return render(request, 'doctors/office_detail.html', {'office': office, 'timesheets': timesheets})
 
+
+@staff_member_required
+def add_office(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+
+    if request.method == 'POST':
+        form = OfficeForm(request.POST)
+        if form.is_valid():
+            office = form.save(commit=False)
+            office.doctor = doctor
+            office.save()
+            return redirect('add_timesheet', doctor_id=doctor.id, office_id=office.id)
+    else:
+        form = OfficeForm()
+
+    return render(request, 'doctors/add_office.html', {'form': form, 'doctor': doctor})
 
 @staff_member_required
 def office_edit(request, office_id):
@@ -112,22 +109,31 @@ def office_edit(request, office_id):
 
     return render(request, 'doctors/office_edit.html', {'form': form, 'office': office})
 
+@staff_member_required
+def add_timesheet(request, doctor_id, office_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    office = get_object_or_404(Office, id=office_id, doctor=doctor)
+
+    if request.method == 'POST':
+        form = TimesheetForm(request.POST)
+        if form.is_valid():
+            timesheet = form.save(commit=False)
+            timesheet.office = office
+            timesheet.save()
+            return redirect('home') 
+    else:
+        form = TimesheetForm()
+
+    return render(request, 'doctors/add_timesheet.html', {
+        'form': form,
+        'doctor': doctor,
+        'office': office
+    })
 
 @staff_member_required
 def timesheet_list(request):
     offices = Office.objects.select_related('doctor__user').all().order_by('doctor__user__first_name', 'doctor__user__last_name')
     return render(request, 'doctors/timesheet_list.html', {'offices': offices})
-
-
-def available_times_for_doctor(request, doctor_id):
-    timesheet_slots = get_available_timeslots_for_doctor(doctor_id)
-    doctor = get_object_or_404(Doctor, id=doctor_id)
-
-    return render(request, 'doctors/show_timesheet.html', {
-        'doctor': doctor,
-        'doctor_id': doctor_id,
-        'timesheet_slots': timesheet_slots,
-    })
 
 
 @staff_member_required
@@ -143,6 +149,16 @@ def timesheet_edit(request, timesheet_id):
         form = TimesheetForm(instance=timesheet)
 
     return render(request, 'doctors/timesheet_edit.html', {'form': form, 'timesheet': timesheet})
+
+
+def available_times_for_doctor(request, doctor_id):
+    timesheet_slots = get_available_timeslots_for_doctor(doctor_id)
+
+    return render(request, 'doctors/show_timesheet.html', {
+        'doctor_id': doctor_id,
+        'timesheet_slots': timesheet_slots,
+    })
+
 
 
 @login_required
@@ -219,16 +235,16 @@ def add_doctor(request):
     if request.method == 'POST':
         form = DoctorCreateForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('doctor_list')
+            doctor = form.save()
+            if doctor.is_active:
+                return redirect('add_office',doctor_id=doctor.id)
+            else:
+                return redirect('doctor_list')
     else:
         form = DoctorCreateForm()
     return render(request, 'doctors/add_doctor.html', {'form': form})
 
 
-@login_required
-def book_visit(request,doctor_id) :
-    doctor = get_object_or_404 (Doctor , id=doctor_id)
 
 def near_doctor(request):
     field = request.GET.get("field", "")
@@ -261,50 +277,3 @@ def google_callback(request):
         user = User.objects.create_user(username=email.split("@")[0], email=email)
     login(request, user)
     return HttpResponseRedirect("/")
-
-def doctor_detail(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
-    doctor_times = Visittime.objects.filter(
-        doctor=doctor,
-        booked_at__isnull=True,
-        canceled_at__isnull=True,
-        review__isnull=True
-    )
-    return render(request, 'doctors/doctor_detail.html', {
-        'doctor': doctor,
-        'doctor_times': doctor_times
-    })
-
-@login_required
-def reserve_visit(request, visit_id):
-    visit = get_object_or_404(
-        Visittime,
-        id=visit_id,
-        patient__isnull=True,
-        canceled_at__isnull=True
-    )
-
-    wallet, _ = Wallet.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-        price = visit.office.price
-        if wallet.inventory >= price:
-            Wallet.objects.filter(user=request.user).update(inventory=F('inventory') - price)
-            visit.patient = request.user
-            visit.booked_at = timezone.now()
-            visit.save()
-
-            send_mail(
-                subject="مشخصات نوبت رزرو شده شما",
-                message=f"سلام {request.user.get_full_name()},\n\nنوبت شما رزرو شد.\nتاریخ: {visit.duration_start.strftime('%Y-%m-%d')}\nساعت: {visit.duration_start.strftime('%H:%M')}\nدفتر: {visit.office.location}",
-                from_email="noreply@example.com",
-                recipient_list=[request.user.email],
-                fail_silently=True
-            )
-
-            messages.success(request, "✅ نوبت رزرو شد و ایمیل ارسال شد.")
-            return redirect('doctor_detail', doctor_id=visit.doctor.id)
-        else:
-            messages.error(request, "❌ موجودی کافی نیست. لطفاً کیف پول خود را شارژ کنید.")
-
-    return render(request, "doctors/reserve_time.html", {"visit": visit, "wallet": wallet})

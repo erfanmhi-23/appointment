@@ -14,12 +14,13 @@ class DoctorCreateForm(forms.ModelForm):
 
     class Meta:
         model = Doctor
-        fields = ['field', 'expertise', 'np', 'image']
+        fields = ['field', 'expertise', 'np', 'image','is_active']
         labels = {
             'field': 'رشته',
             'expertise': 'تخصص',
             'np': 'شماره نظام پزشکی',
             'image': 'عکس',
+            'is_active' : 'فعال',
         }
 
     def save(self, commit=True):
