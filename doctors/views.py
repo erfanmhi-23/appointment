@@ -13,6 +13,7 @@ from wallet.models import Wallet
 from django.http import HttpResponseBadRequest , HttpResponseRedirect
 from django.contrib.auth import login , get_user_model
 from patient.models import Patient
+from django.core.mail import send_mail
 
 
 User = get_user_model()
@@ -313,23 +314,22 @@ def send_visit_confirmation_email(patient, doctor, office, start, end, price):
 
     subject = 'تایید رزرو نوبت'
     message = f"""
-سلام {patient.get_full_name()}،
+            سلام {patient.get_full_name()}،
 
-نوبت شما با موفقیت رزرو شد.
+            نوبت شما با موفقیت رزرو شد.
 
-جزئیات نوبت:
-دکتر: {doctor.user.get_full_name()}
-مطب: {office.location}
-تاریخ: {start.date()}
-ساعت شروع: {start.time().strftime('%H:%M')}
-ساعت پایان: {end.time().strftime('%H:%M')}
-هزینه ویزیت: {price} تومان
+            جزئیات نوبت:
+            دکتر: {doctor.user.get_full_name()}
+            مطب: {office.location}
+            تاریخ: {start.date()}
+            ساعت شروع: {start.time().strftime('%H:%M')}
+            ساعت پایان: {end.time().strftime('%H:%M')}
+            هزینه ویزیت: {price} تومان
 
-با تشکر،
-تیم کلینیک
-    """
-    from django.core.mail import send_mail
-
+            با تشکر،
+            تیم کلینیک
+            """
+    
     send_mail(
         subject,
         message,

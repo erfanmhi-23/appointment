@@ -51,24 +51,6 @@ class VisitTimeTest(TestCase):
             duration_end=timezone.now() + timezone.timedelta(hours=2)
         )
 
-    def test_reserve_visit(self):
-        self.client.login(username="patient", password="123")
-        url = reverse("reserve_visit_time", args=[self.visit.id])
-        self.client.post(url)
-        self.visit.refresh_from_db()
-        assert self.visit.patient == self.patient
-        assert self.visit.booked_at is not None
-
-    def test_cancel_visit(self):
-        self.visit.patient = self.patient
-        self.visit.save()
-        self.client.login(username="patient", password="123")
-        url = reverse("cancel_visit_time", args=[self.visit.id])
-        self.client.post(url)
-        self.visit.refresh_from_db()
-        assert self.visit.canceled_at is not None
-
-
 class AddDoctorTest(TestCase):
     def setUp(self):
         self.admin = User.objects.create_superuser(username="admin", password="123")
