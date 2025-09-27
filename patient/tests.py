@@ -8,13 +8,12 @@ User = get_user_model()
 
 class PatientSignUpTests(TestCase):
     def test_get_sign_up_page(self):
-        """فرم ثبت نام به درستی در GET نمایش داده می‌شود"""
+        
         response = self.client.get(reverse('sign_up'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<form")
 
     def test_post_valid_data_creates_patient(self):
-        """ارسال داده معتبر باعث ایجاد User و Patient می‌شود"""
         data = {
             'username': 'testuser',
             'password': 'testpassword',
@@ -33,7 +32,6 @@ class PatientSignUpTests(TestCase):
         self.assertEqual(patient.na_id, '1234567890')
 
     def test_post_duplicate_username(self):
-        """ثبت نام با نام کاربری تکراری خطا می‌دهد"""
         User.objects.create_user(username='testuser', password='12345')
         data = {
             'username': 'testuser',
